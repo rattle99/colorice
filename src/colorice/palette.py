@@ -104,21 +104,19 @@ def _select_or_synthesize(
     return selected
 
 
-def assign_ansi_roles(
+def _assign_semantic(
     colors: list[np.ndarray],
-    min_contrast: float = 7.0,
-    light: bool = False,
+    min_contrast: float,
+    light: bool,
 ) -> list[str]:
-    """Assign 16 ANSI colors from extracted Oklab colors.
+    """Semantic assignment — colors mapped to ANSI slots by hue zone.
 
-    Returns list of 16 hex strings (color0 through color15).
+    Red always looks red, green looks green, etc.
+    Missing hue sectors are synthesized.
     """
-    # Step 1: Background and foreground
     bg = _pick_background(colors, light)
     fg = _pick_foreground(colors, bg, min_contrast, light)
 
-    # Step 2: Classify remaining colors by hue
-    # Exclude colors too close to bg/fg
     remaining = [
         c for c in colors
         if float(np.linalg.norm(c - bg)) > 0.05
@@ -128,11 +126,8 @@ def assign_ansi_roles(
         remaining = list(colors)
 
     classified = _classify_by_hue(remaining)
-
-    # Step 3: Select best per role
     selected = _select_or_synthesize(classified, colors)
 
-    # Step 4: Enforce contrast
     ansi_colors_lab = [
         selected["red"],
         selected["green"],
@@ -142,13 +137,64 @@ def assign_ansi_roles(
         selected["cyan"],
     ]
 
-    contrast_min = min(min_contrast, 4.5)  # ANSI colors need at least 4.5:1
+    return _build_palette(bg, fg, ansi_colors_lab, min_contrast, light)
+
+
+def _assign_aesthetic(
+    colors: list[np.ndarray],
+    min_contrast: float,
+    light: bool,
+) -> list[str]:
+    """Aesthetic assignment — colors sorted by lightness, no hue enforcement.
+
+    Produces palettes that closely match the wallpaper's actual colors.
+    Color1 might be purple, color2 might be pink — semantics are ignored.
+    """
+    bg = _pick_background(colors, light)
+    fg = _pick_foreground(colors, bg, min_contrast, light)
+
+    # Filter out colors too close to bg/fg
+    remaining = [
+        c for c in colors
+        if float(np.linalg.norm(c - bg)) > 0.05
+        and float(np.linalg.norm(c - fg)) > 0.05
+    ]
+    if not remaining:
+        remaining = list(colors)
+
+    # Sort by chroma (most vivid first) then pick top 6
+    remaining.sort(key=oklab_chroma, reverse=True)
+
+    # Take up to 6, pad with lightness-sorted duplicates if needed
+    ansi_colors_lab = remaining[:6]
+    while len(ansi_colors_lab) < 6:
+        # Duplicate with slight lightness shift
+        base = ansi_colors_lab[len(ansi_colors_lab) % len(remaining)]
+        shifted = base.copy()
+        shifted[0] = min(1.0, float(shifted[0]) + 0.08)
+        ansi_colors_lab.append(shifted)
+
+    # Sort the 6 by lightness for a natural gradient
+    ansi_colors_lab.sort(key=lambda c: float(c[0]))
+
+    return _build_palette(bg, fg, ansi_colors_lab, min_contrast, light)
+
+
+def _build_palette(
+    bg: np.ndarray,
+    fg: np.ndarray,
+    ansi_colors_lab: list[np.ndarray],
+    min_contrast: float,
+    light: bool,
+) -> list[str]:
+    """Build the 16-color palette from bg, fg, and 6 ANSI colors."""
+    contrast_min = min(min_contrast, 4.5)
     for i in range(len(ansi_colors_lab)):
         ansi_colors_lab[i] = enforce_contrast(ansi_colors_lab[i], bg, contrast_min)
 
     ansi_colors_lab = ensure_distinguishable(ansi_colors_lab, min_delta=0.05)
 
-    # Step 5: Generate bright variants
+    # Bright variants
     bright_bg = bg.copy()
     if light:
         bright_bg[0] = max(0.0, bright_bg[0] - 0.15)
@@ -162,7 +208,6 @@ def assign_ansi_roles(
             bc[0] = max(0.0, bc[0] - 0.10)
         else:
             bc[0] = min(1.0, bc[0] + 0.10)
-        # Boost chroma slightly
         C = oklab_chroma(bc)
         h = oklab_hue(bc)
         bc = oklab_from_lch(float(bc[0]), C * 1.1, h)
@@ -175,24 +220,43 @@ def assign_ansi_roles(
     else:
         bright_fg[0] = min(1.0, bright_fg[0] + 0.08)
 
-    # Step 6: Assemble and convert to hex
     palette = [
-        bg,                    # 0: black (background)
-        ansi_colors_lab[0],    # 1: red
-        ansi_colors_lab[1],    # 2: green
-        ansi_colors_lab[2],    # 3: yellow
-        ansi_colors_lab[3],    # 4: blue
-        ansi_colors_lab[4],    # 5: magenta
-        ansi_colors_lab[5],    # 6: cyan
-        fg,                    # 7: white (foreground)
-        bright_bg,             # 8: bright black
-        bright_colors[0],      # 9: bright red
-        bright_colors[1],      # 10: bright green
-        bright_colors[2],      # 11: bright yellow
-        bright_colors[3],      # 12: bright blue
-        bright_colors[4],      # 13: bright magenta
-        bright_colors[5],      # 14: bright cyan
-        bright_fg,             # 15: bright white
+        bg,                    # 0
+        ansi_colors_lab[0],    # 1
+        ansi_colors_lab[1],    # 2
+        ansi_colors_lab[2],    # 3
+        ansi_colors_lab[3],    # 4
+        ansi_colors_lab[4],    # 5
+        ansi_colors_lab[5],    # 6
+        fg,                    # 7
+        bright_bg,             # 8
+        bright_colors[0],      # 9
+        bright_colors[1],      # 10
+        bright_colors[2],      # 11
+        bright_colors[3],      # 12
+        bright_colors[4],      # 13
+        bright_colors[5],      # 14
+        bright_fg,             # 15
     ]
 
     return [oklab_to_hex(gamut_clamp(c)) for c in palette]
+
+
+def assign_ansi_roles(
+    colors: list[np.ndarray],
+    min_contrast: float = 7.0,
+    light: bool = False,
+    semantic: bool = True,
+) -> list[str]:
+    """Assign 16 ANSI colors from extracted Oklab colors.
+
+    Args:
+        semantic: If True, enforce hue-zone mapping (red looks red, etc).
+                  If False, assign aesthetically (wallpaper-matching, like pywal).
+
+    Returns list of 16 hex strings (color0 through color15).
+    """
+    if semantic:
+        return _assign_semantic(colors, min_contrast, light)
+    else:
+        return _assign_aesthetic(colors, min_contrast, light)

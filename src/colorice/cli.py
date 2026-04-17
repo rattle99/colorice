@@ -47,6 +47,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="Minimum fg/bg contrast ratio (default: 7.0)",
     )
     parser.add_argument(
+        "--semantic",
+        action="store_true",
+        help="Semantic mode — enforce ANSI color name conventions (red looks red, etc.)",
+    )
+    parser.add_argument(
         "--format",
         choices=["colorice", "pywal"],
         default="colorice",
@@ -101,7 +106,10 @@ def main() -> None:
 
     pixels = load_and_resize(args.image)
     dominant = extract_dominant_colors(pixels, n_colors=args.colors)
-    dominant = fill_color_gaps(dominant)
+
+    # Only fill hue gaps in semantic mode
+    if args.semantic:
+        dominant = fill_color_gaps(dominant)
 
     # Generate palettes for each mood
     schemes = []
@@ -112,6 +120,7 @@ def main() -> None:
             transformed,
             min_contrast=args.min_contrast,
             light=args.light,
+            semantic=args.semantic,
         )
         scheme = ColorScheme(
             wallpaper=os.path.abspath(args.image),

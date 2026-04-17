@@ -28,7 +28,6 @@ def preview_palette(scheme: ColorScheme, index: int, total: int) -> str:
     lines = []
     bg = scheme.background
     fg = scheme.foreground
-    ext = scheme.extended
     block = " " * BLOCK_WIDTH
 
     lines.append(f"\n  Palette {index}/{total}: {scheme.mood}")
@@ -68,55 +67,6 @@ def preview_palette(scheme: ColorScheme, index: int, total: int) -> str:
     row += " " * (TOTAL_WIDTH - BLOCK_WIDTH * len(names))
     row += RESET
     lines.append(row)
-
-    # Extended syntax colors preview
-    lines.append("")
-    lines.append(f"  {_fg_escape(ext['comment'])}// Extended 24-bit syntax colors{RESET}")
-
-    def _syntax_line(content: str) -> str:
-        padded = content.ljust(TOTAL_WIDTH)
-        return f"  {_bg_escape(bg)}{padded}{RESET}"
-
-    line1 = (
-        f"{_fg_escape(ext['keyword'])}func "
-        f"{_fg_escape(ext['function'])}main"
-        f"{_fg_escape(fg)}("
-        f"{_fg_escape(ext['parameter'])}args"
-        f"{_fg_escape(ext['operator'])}: "
-        f"{_fg_escape(ext['type'])}List"
-        f"{_fg_escape(fg)})"
-    )
-    lines.append(_syntax_line(line1))
-
-    line2 = (
-        f"  {_fg_escape(ext['keyword'])}val "
-        f"{_fg_escape(fg)}x"
-        f"{_fg_escape(ext['operator'])} = "
-        f"{_fg_escape(ext['number'])}42"
-        f"{_fg_escape(ext['operator'])} + "
-        f"{_fg_escape(ext['string'])}\"hello\""
-    )
-    lines.append(_syntax_line(line2))
-
-    line3 = (
-        f"  {_fg_escape(ext['decorator'])}@cached "
-        f"{_fg_escape(ext['comment'])}// "
-        f"{_fg_escape(ext['tag'])}TODO: "
-        f"{_fg_escape(ext['comment'])}refactor this"
-    )
-    lines.append(_syntax_line(line3))
-
-    # Diff preview
-    lines.append("")
-    diff_w = TOTAL_WIDTH // 2
-    add_text = "  + added line".ljust(diff_w)
-    del_text = "  - deleted line".ljust(diff_w)
-    lines.append(
-        f"  {_bg_escape(ext['diff_add_bg'])}{_fg_escape(ext['diff_add'])}"
-        f"{add_text}{RESET}"
-        f"{_bg_escape(ext['diff_delete_bg'])}{_fg_escape(ext['diff_delete'])}"
-        f"{del_text}{RESET}"
-    )
 
     lines.append("")
     return "\n".join(lines)

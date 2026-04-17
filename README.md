@@ -32,6 +32,7 @@ colorice <image> [options]
   -m, --moods MOOD[,...]    Mood names (default: vibrant,muted,warm,cool)
   -c, --colors N            Dominant colors to extract (5-12, default: 8)
   --min-contrast RATIO      Min fg/bg contrast ratio (default: 7.0)
+  --semantic                Enforce ANSI color name conventions (red looks red, etc.)
   --format FORMAT           Output: colorice|pywal (default: colorice)
   --no-preview              Skip preview, output first palette
   --light                   Light theme
@@ -58,6 +59,8 @@ colorice wallpaper.jpg -m vibrant,cool
 
 The JSON output can be consumed by template systems like pywal or wallust to apply the scheme to your terminal, editor, window manager, etc.
 
+> **TODO:** Colorice currently only generates the color scheme JSON. It does not yet apply colors to config files (kitty, i3, polybar, dunst, etc.). A template engine that reads the JSON and replaces colors in your configs is planned but not implemented.
+
 ## How It Works
 
 1. **Extract** — loads the image, resizes for performance, runs KMeans clustering in Oklab color space (perceptually uniform)
@@ -65,7 +68,7 @@ The JSON output can be consumed by template systems like pywal or wallust to app
 3. **Mood transform** — adjusts chroma/hue for the selected mood variant
 4. **Assign roles** — maps colors to the 16 ANSI slots by hue zone (red for errors, green for success, etc.)
 5. **Enforce contrast** — adjusts lightness to meet WCAG contrast ratios against the background
-6. **Output** — writes JSON with ANSI colors, extended colors, and semantic roles
+6. **Output** — writes JSON with 16 ANSI colors and special roles
 
 ## Development
 
