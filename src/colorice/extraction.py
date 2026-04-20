@@ -1,4 +1,10 @@
-"""Image color extraction using KMeans clustering in Oklab space."""
+"""Image color extraction using KMeans clustering in Oklab space.
+
+Supports two extraction strategies:
+- Over-cluster + farthest-first (default): fast, no extra deps
+- Felzenszwalb segmentation: region-aware, gives each image region
+  equal weight regardless of pixel count (requires scikit-image)
+"""
 
 import numpy as np
 from PIL import Image
@@ -9,6 +15,12 @@ from .oklab import oklab_chroma, oklab_from_lch, oklab_hue, srgb_to_oklab
 
 def load_and_resize(path: str, max_pixels: int = 64_000) -> np.ndarray:
     """Load image, resize to ~max_pixels, return (N, 3) sRGB [0,1] array."""
+    img = _load_image(path, max_pixels)
+    return img.reshape(-1, 3)
+
+
+def _load_image(path: str, max_pixels: int = 64_000) -> np.ndarray:
+    """Load image, resize to ~max_pixels, return (H, W, 3) sRGB [0,1] array."""
     img = Image.open(path).convert("RGB")
     w, h = img.size
     total = w * h
@@ -19,8 +31,7 @@ def load_and_resize(path: str, max_pixels: int = 64_000) -> np.ndarray:
         new_h = max(1, int(h * scale))
         img = img.resize((new_w, new_h), Image.LANCZOS)
 
-    pixels = np.array(img).reshape(-1, 3) / 255.0
-    return pixels
+    return np.array(img) / 255.0
 
 
 def _farthest_first(
@@ -80,6 +91,58 @@ def extract_dominant_colors(
     seed_idx = int(np.argmax(counts))
 
     return _farthest_first(centroids, n_colors, seed_idx)
+
+
+def extract_dominant_colors_segmented(
+    path: str,
+    n_colors: int = 8,
+    random_state: int = 42,
+    max_pixels: int = 64_000,
+    scale: int = 100,
+    min_size: int = 50,
+) -> list[np.ndarray]:
+    """Region-aware color extraction using Felzenszwalb segmentation.
+
+    Segments the image into perceptual regions, extracts one dominant color
+    per region (KMeans k=1 centroid in Oklab space), then uses farthest-first
+    to pick the most diverse set. Each region contributes equally regardless
+    of pixel count — a small red flower gets the same weight as a large sky.
+
+    Args:
+        path: Image file path.
+        n_colors: Number of colors to return.
+        random_state: Random state for KMeans.
+        max_pixels: Resize target for performance.
+        scale: Felzenszwalb scale parameter — higher values produce larger
+               regions. 100 is a good default for wallpaper-sized images
+               resized to ~64k pixels.
+        min_size: Minimum region size in pixels. Regions smaller than this
+                  are merged into neighbors.
+    """
+    from skimage.segmentation import felzenszwalb
+
+    img = _load_image(path, max_pixels)
+    segment_labels = felzenszwalb(img, scale=scale, min_size=min_size)
+
+    region_ids = np.unique(segment_labels)
+    region_colors: list[np.ndarray] = []
+
+    for rid in region_ids:
+        mask = segment_labels == rid
+        region_pixels = img[mask]  # (N, 3) sRGB
+        oklab_pixels = srgb_to_oklab(region_pixels)
+        # Use the centroid (mean) of the region in Oklab space
+        centroid = oklab_pixels.mean(axis=0)
+        region_colors.append(centroid)
+
+    if len(region_colors) <= n_colors:
+        return region_colors
+
+    # Seed with the region that has the most pixels (dominant region)
+    region_sizes = [int(np.sum(segment_labels == rid)) for rid in region_ids]
+    seed_idx = int(np.argmax(region_sizes))
+
+    return _farthest_first(region_colors, n_colors, seed_idx)
 
 
 # Hue sectors for ANSI color roles

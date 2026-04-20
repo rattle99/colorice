@@ -6,7 +6,12 @@ import sys
 
 from . import __version__
 from .display import interactive_select, preview_palette
-from .extraction import extract_dominant_colors, fill_color_gaps, load_and_resize
+from .extraction import (
+    extract_dominant_colors,
+    extract_dominant_colors_segmented,
+    fill_color_gaps,
+    load_and_resize,
+)
 from .moods import MoodRegistry
 from .palette import assign_ansi_roles
 from .scheme import ColorScheme
@@ -73,6 +78,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="Suppress preview output",
     )
     parser.add_argument(
+        "--segment",
+        action="store_true",
+        help="Use Felzenszwalb segmentation for region-aware extraction (requires scikit-image)",
+    )
+    parser.add_argument(
         "-v", "--version",
         action="version",
         version=f"colorice {__version__}",
@@ -104,8 +114,11 @@ def main() -> None:
     if not args.quiet:
         print(f"  Extracting colors from {args.image}...")
 
-    pixels = load_and_resize(args.image)
-    dominant = extract_dominant_colors(pixels, n_colors=args.colors)
+    if args.segment:
+        dominant = extract_dominant_colors_segmented(args.image, n_colors=args.colors)
+    else:
+        pixels = load_and_resize(args.image)
+        dominant = extract_dominant_colors(pixels, n_colors=args.colors)
 
     # Only fill hue gaps in semantic mode
     if args.semantic:
