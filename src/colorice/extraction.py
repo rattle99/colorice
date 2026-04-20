@@ -23,28 +23,63 @@ def load_and_resize(path: str, max_pixels: int = 64_000) -> np.ndarray:
     return pixels
 
 
+def _farthest_first(
+    candidates: list[np.ndarray],
+    n: int,
+    seed_idx: int = 0,
+) -> list[np.ndarray]:
+    """Greedily pick n most spread-out colors from candidates.
+
+    Starts with the seed, then repeatedly picks the candidate
+    whose minimum distance to all already-picked colors is largest.
+    """
+    picked = [candidates[seed_idx]]
+    remaining = [c for i, c in enumerate(candidates) if i != seed_idx]
+
+    while len(picked) < n and remaining:
+        best_idx = 0
+        best_min_dist = -1.0
+
+        for i, c in enumerate(remaining):
+            min_dist = min(float(np.linalg.norm(c - p)) for p in picked)
+            if min_dist > best_min_dist:
+                best_min_dist = min_dist
+                best_idx = i
+
+        picked.append(remaining.pop(best_idx))
+
+    return picked
+
+
 def extract_dominant_colors(
     pixels: np.ndarray,
     n_colors: int = 8,
     random_state: int = 42,
 ) -> list[np.ndarray]:
-    """Run KMeans in Oklab space. Returns Oklab colors sorted by cluster size."""
+    """Run KMeans in Oklab space with over-clustering + farthest-first selection.
+
+    Over-clusters to 4x the requested count, then selects the most
+    perceptually spread-out centroids. This reduces bias toward large
+    uniform regions (e.g., sky) and surfaces accent colors.
+    """
     oklab_pixels = srgb_to_oklab(pixels)
 
+    n_over = min(n_colors * 4, len(oklab_pixels))
     kmeans = KMeans(
-        n_clusters=n_colors,
+        n_clusters=n_over,
         random_state=random_state,
         n_init=10,
     )
     kmeans.fit(oklab_pixels)
 
-    # Sort centroids by cluster size (most dominant first)
-    labels = kmeans.labels_
-    centroids = kmeans.cluster_centers_
-    counts = np.bincount(labels, minlength=n_colors)
-    order = np.argsort(-counts)
+    centroids = list(kmeans.cluster_centers_)
 
-    return [centroids[i] for i in order]
+    # Seed farthest-first with the most dominant cluster
+    labels = kmeans.labels_
+    counts = np.bincount(labels, minlength=n_over)
+    seed_idx = int(np.argmax(counts))
+
+    return _farthest_first(centroids, n_colors, seed_idx)
 
 
 # Hue sectors for ANSI color roles
