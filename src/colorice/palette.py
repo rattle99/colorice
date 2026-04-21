@@ -200,6 +200,9 @@ def _build_palette(
         bright_bg[0] = max(0.0, bright_bg[0] - 0.15)
     else:
         bright_bg[0] = min(1.0, bright_bg[0] + 0.15)
+    # color8 is used for subdued text (prompt secondary, comments) —
+    # enforce readable contrast (3:1) so it's never invisible against bg
+    bright_bg = enforce_contrast(bright_bg, bg, 3.0)
 
     bright_colors = []
     for c in ansi_colors_lab:
@@ -219,6 +222,8 @@ def _build_palette(
         bright_fg[0] = max(0.0, bright_fg[0] - 0.08)
     else:
         bright_fg[0] = min(1.0, bright_fg[0] + 0.08)
+    # color15 should always be readable against bg
+    bright_fg = enforce_contrast(bright_fg, bg, contrast_min)
 
     palette = [
         bg,                    # 0

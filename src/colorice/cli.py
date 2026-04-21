@@ -1,11 +1,12 @@
 """CLI interface for colorice."""
 
 import argparse
+import json
 import os
 import sys
 
 from . import __version__
-from .display import interactive_select, preview_palette
+from .display import interactive_select
 from .extraction import (
     extract_dominant_colors,
     extract_dominant_colors_segmented,
@@ -22,7 +23,7 @@ def build_parser() -> argparse.ArgumentParser:
         prog="colorice",
         description="Generate terminal color schemes from wallpaper images.",
     )
-    parser.add_argument("image", help="Path to wallpaper image (PNG, JPG, WEBP)")
+    parser.add_argument("image", nargs="?", default=None, help="Path to wallpaper image (PNG, JPG, WEBP)")
     parser.add_argument(
         "-o", "--output",
         default=os.path.expanduser("~/.config/colorice/colors.json"),
@@ -110,9 +111,60 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _load_scheme_from_file(path: str) -> ColorScheme:
+    """Load a ColorScheme from an existing JSON file."""
+    with open(path) as f:
+        data = json.load(f)
+
+    colors = [data["colors"][f"color{i}"] for i in range(16)]
+    return ColorScheme(
+        wallpaper=data.get("wallpaper", ""),
+        mood=data.get("mood", "unknown"),
+        colors=colors,
+    )
+
+
+def _apply_templates(scheme: ColorScheme, args: argparse.Namespace) -> None:
+    """Apply scheme to configured templates."""
+    from .config import load_config
+    from .templates.applicator import apply_all_templates
+
+    config = load_config(args.config)
+    if not config.templates:
+        if not args.quiet:
+            print("  No templates configured. See ~/.config/colorice/config.toml")
+        return
+
+    if not args.quiet:
+        print("  Applying templates...")
+    apply_all_templates(
+        scheme,
+        config,
+        dry_run=args.dry_run,
+        no_hooks=args.no_hooks,
+        quiet=args.quiet,
+    )
+
+
 def main() -> None:
     parser = build_parser()
     args = parser.parse_args()
+
+    # Apply-only mode: no image, load existing scheme
+    if args.image is None:
+        if not (args.apply or args.dry_run):
+            parser.error("image is required unless --apply or --dry-run is used")
+
+        output_path = os.path.expanduser(args.output)
+        if not os.path.isfile(output_path):
+            print(f"Error: No scheme found at {output_path}. Generate one first.", file=sys.stderr)
+            sys.exit(1)
+
+        selected = _load_scheme_from_file(output_path)
+        if not args.quiet:
+            print(f"  Loaded scheme from {output_path}")
+        _apply_templates(selected, args)
+        return
 
     # Validate image path
     if not os.path.isfile(args.image):
@@ -176,20 +228,4 @@ def main() -> None:
 
     # Apply templates
     if args.apply or args.dry_run:
-        from .config import load_config
-        from .templates.applicator import apply_all_templates
-
-        config = load_config(args.config)
-        if not config.templates:
-            if not args.quiet:
-                print("  No templates configured. See ~/.config/colorice/config.toml")
-        else:
-            if not args.quiet:
-                print("  Applying templates...")
-            apply_all_templates(
-                selected,
-                config,
-                dry_run=args.dry_run,
-                no_hooks=args.no_hooks,
-                quiet=args.quiet,
-            )
+        _apply_templates(selected, args)
