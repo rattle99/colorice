@@ -83,6 +83,26 @@ def build_parser() -> argparse.ArgumentParser:
         help="Use Felzenszwalb segmentation for region-aware extraction (requires scikit-image)",
     )
     parser.add_argument(
+        "-a", "--apply",
+        action="store_true",
+        help="Apply color scheme to configured templates",
+    )
+    parser.add_argument(
+        "--config",
+        default=None,
+        help="Path to config.toml (default: ~/.config/colorice/config.toml)",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Preview template output without writing files",
+    )
+    parser.add_argument(
+        "--no-hooks",
+        action="store_true",
+        help="Skip post-apply hooks",
+    )
+    parser.add_argument(
         "-v", "--version",
         action="version",
         version=f"colorice {__version__}",
@@ -153,3 +173,23 @@ def main() -> None:
 
     if not args.quiet:
         print(f"\n  Scheme written to {args.output}")
+
+    # Apply templates
+    if args.apply or args.dry_run:
+        from .config import load_config
+        from .templates.applicator import apply_all_templates
+
+        config = load_config(args.config)
+        if not config.templates:
+            if not args.quiet:
+                print("  No templates configured. See ~/.config/colorice/config.toml")
+        else:
+            if not args.quiet:
+                print("  Applying templates...")
+            apply_all_templates(
+                selected,
+                config,
+                dry_run=args.dry_run,
+                no_hooks=args.no_hooks,
+                quiet=args.quiet,
+            )
