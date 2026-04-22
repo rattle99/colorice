@@ -37,23 +37,12 @@ def test_special_keys():
     assert special["foreground"] == "#ecf0f1"
 
 
-def test_colorice_json_structure():
-    """Colorice JSON should have all top-level keys."""
+def test_json_structure():
+    """JSON output should have all expected keys."""
     scheme = _sample_scheme()
-    data = scheme.to_colorice_json()
+    data = scheme.to_json()
     assert "wallpaper" in data
     assert "mood" in data
-    assert "special" in data
-    assert "colors" in data
-    assert "extended" not in data
-    assert len(data["colors"]) == 16
-
-
-def test_pywal_json_structure():
-    """Pywal JSON should have the expected keys."""
-    scheme = _sample_scheme()
-    data = scheme.to_pywal_json()
-    assert "wallpaper" in data
     assert "alpha" in data
     assert "special" in data
     assert "colors" in data

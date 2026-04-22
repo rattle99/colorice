@@ -41,7 +41,7 @@ def _pick_background(colors: list[np.ndarray], light: bool = False) -> np.ndarra
         bg = min(colors, key=lambda c: float(c[0]))
         L = min(float(bg[0]), 0.15)
 
-    C = oklab_chroma(bg) * 0.5  # reduce chroma for bg
+    C = max(oklab_chroma(bg) * 0.7, 0.015)  # gentle reduction with chroma floor for visible tint
     h = oklab_hue(bg)
     return gamut_clamp(oklab_from_lch(L, C, h))
 

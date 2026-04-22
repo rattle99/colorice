@@ -33,33 +33,27 @@ class ColorScheme:
             "cursor": self.cursor,
         }
 
-    def to_colorice_json(self) -> dict:
-        """Full colorice JSON format."""
+    def to_json(self) -> dict:
+        """JSON output format (compatible with pywal)."""
         return {
             "wallpaper": self.wallpaper,
             "mood": self.mood,
-            "special": self.special,
-            "colors": {f"color{i}": c for i, c in enumerate(self.colors)},
-        }
-
-    def to_pywal_json(self) -> dict:
-        """Pywal-compatible JSON format."""
-        return {
-            "wallpaper": self.wallpaper,
             "alpha": "100",
             "special": self.special,
             "colors": {f"color{i}": c for i, c in enumerate(self.colors)},
         }
 
-    def write(self, path: str, fmt: str = "colorice") -> None:
-        """Write JSON to path."""
-        os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+    def write(self, path: str) -> None:
+        """Write JSON to path, or stdout if path is '-'."""
+        import sys
 
-        if fmt == "pywal":
-            data = self.to_pywal_json()
+        data = self.to_json()
+
+        if path == "-":
+            json.dump(data, sys.stdout, indent=2)
+            sys.stdout.write("\n")
         else:
-            data = self.to_colorice_json()
-
-        with open(path, "w") as f:
-            json.dump(data, f, indent=2)
-            f.write("\n")
+            os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+            with open(path, "w") as f:
+                json.dump(data, f, indent=2)
+                f.write("\n")

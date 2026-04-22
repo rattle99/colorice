@@ -58,12 +58,6 @@ def build_parser() -> argparse.ArgumentParser:
         help="Semantic mode — enforce ANSI color name conventions (red looks red, etc.)",
     )
     parser.add_argument(
-        "--format",
-        choices=["colorice", "pywal"],
-        default="colorice",
-        help="Output format (default: colorice)",
-    )
-    parser.add_argument(
         "--no-preview",
         action="store_true",
         help="Skip preview, output first palette",
@@ -102,6 +96,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--no-hooks",
         action="store_true",
         help="Skip post-apply hooks",
+    )
+    parser.add_argument(
+        "--list-moods",
+        action="store_true",
+        help="List available mood names and exit",
     )
     parser.add_argument(
         "-v", "--version",
@@ -161,6 +160,12 @@ def _apply_templates(scheme: ColorScheme, args: argparse.Namespace) -> None:
 def main() -> None:
     parser = build_parser()
     args = parser.parse_args()
+
+    # List moods and exit
+    if args.list_moods:
+        for name in MoodRegistry.list_names():
+            print(name)
+        return
 
     # Apply-only mode: no image, load existing scheme
     if args.image is None:
@@ -240,11 +245,12 @@ def main() -> None:
     else:
         selected = interactive_select(schemes)
 
-    # Write output
-    selected.write(args.output, fmt=args.format)
+    # Write output (skip if --dry-run)
+    if not args.dry_run:
+        selected.write(args.output)
 
-    if not args.quiet:
-        print(f"\n  Scheme written to {args.output}")
+        if not args.quiet:
+            print(f"\n  Scheme written to {args.output}")
 
     # Apply templates
     if args.apply or args.dry_run:
