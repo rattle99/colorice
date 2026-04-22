@@ -51,10 +51,19 @@ def load_config(path: str | None = None) -> ColoriceConfig:
     )
 
     templates = []
-    for t in data.get("templates", []):
+    for i, t in enumerate(data.get("templates", [])):
+        name = t.get("name", f"template-{i}")
+        if "input" not in t:
+            raise ValueError(
+                f"Template '{name}' in {config_path} is missing required 'input' field."
+            )
+        if "output" not in t:
+            raise ValueError(
+                f"Template '{name}' in {config_path} is missing required 'output' field."
+            )
         templates.append(
             TemplateMapping(
-                name=t.get("name", "unnamed"),
+                name=name,
                 input=t["input"],
                 output=os.path.expanduser(t["output"]),
                 hook=t.get("hook"),

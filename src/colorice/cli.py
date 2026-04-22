@@ -44,7 +44,7 @@ def build_parser() -> argparse.ArgumentParser:
         "-c", "--colors",
         type=int,
         default=8,
-        help="Number of dominant colors to extract (5-12, default: 8)",
+        help="Number of dominant colors to extract (3-16, default: 8)",
     )
     parser.add_argument(
         "--min-contrast",
@@ -114,9 +114,21 @@ def build_parser() -> argparse.ArgumentParser:
 def _load_scheme_from_file(path: str) -> ColorScheme:
     """Load a ColorScheme from an existing JSON file."""
     with open(path) as f:
-        data = json.load(f)
+        try:
+            data = json.load(f)
+        except json.JSONDecodeError as e:
+            print(f"Error: Malformed JSON in {path}: {e}", file=sys.stderr)
+            sys.exit(1)
 
-    colors = [data["colors"][f"color{i}"] for i in range(16)]
+    colors_data = data.get("colors", {})
+    colors = []
+    for i in range(16):
+        key = f"color{i}"
+        if key not in colors_data:
+            print(f"Error: Missing '{key}' in {path}. Expected 16 colors (color0-color15).", file=sys.stderr)
+            sys.exit(1)
+        colors.append(colors_data[key])
+
     return ColorScheme(
         wallpaper=data.get("wallpaper", ""),
         mood=data.get("mood", "unknown"),
@@ -166,6 +178,10 @@ def main() -> None:
         _apply_templates(selected, args)
         return
 
+    # Validate color count
+    if args.colors < 3 or args.colors > 16:
+        parser.error("--colors must be between 3 and 16")
+
     # Validate image path
     if not os.path.isfile(args.image):
         print(f"Error: Image not found: {args.image}", file=sys.stderr)
@@ -178,9 +194,13 @@ def main() -> None:
     # Pad with defaults if fewer moods than requested palettes
     default_moods = ["vibrant", "muted", "warm", "cool"]
     while len(mood_names) < args.num_palettes:
+        added = False
         for m in default_moods:
             if m not in mood_names and len(mood_names) < args.num_palettes:
                 mood_names.append(m)
+                added = True
+        if not added:
+            break
 
     # Extract colors
     if not args.quiet:

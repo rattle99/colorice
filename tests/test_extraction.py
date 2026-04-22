@@ -66,7 +66,7 @@ def test_fill_color_gaps_preserves_existing():
 
 def _make_test_image(path: str, regions: list[tuple[tuple[int,int,int], int]]) -> None:
     """Create a test image with colored blocks stacked vertically."""
-    width = 100
+    width = 256
     total_height = sum(h for _, h in regions)
     img = Image.new("RGB", (width, total_height))
     y = 0
@@ -83,10 +83,10 @@ def test_segmented_returns_correct_count():
     with tempfile.TemporaryDirectory() as tmpdir:
         path = os.path.join(tmpdir, "test.png")
         _make_test_image(path, [
-            ((255, 0, 0), 50),    # red
-            ((0, 255, 0), 50),    # green
-            ((0, 0, 255), 50),    # blue
-            ((255, 255, 0), 50),  # yellow
+            ((255, 0, 0), 64),    # red
+            ((0, 255, 0), 64),    # green
+            ((0, 0, 255), 64),    # blue
+            ((255, 255, 0), 64),  # yellow
         ])
         colors = extract_dominant_colors_segmented(path, n_colors=4)
         assert len(colors) == 4
@@ -102,8 +102,8 @@ def test_segmented_finds_small_regions():
         path = os.path.join(tmpdir, "test.png")
         # 90% blue sky, 10% red subject
         _make_test_image(path, [
-            ((30, 60, 150), 180),   # large blue region
-            ((220, 40, 30), 20),    # small red region
+            ((30, 60, 150), 230),   # large blue region
+            ((220, 40, 30), 26),    # small red region
         ])
         colors = extract_dominant_colors_segmented(path, n_colors=4)
         # Should have at least 2 distinct colors (not all blue)
@@ -119,9 +119,9 @@ def test_segmented_all_colors_valid_oklab():
     with tempfile.TemporaryDirectory() as tmpdir:
         path = os.path.join(tmpdir, "test.png")
         _make_test_image(path, [
-            ((200, 100, 50), 60),
-            ((50, 100, 200), 60),
-            ((100, 200, 50), 60),
+            ((200, 100, 50), 86),
+            ((50, 100, 200), 86),
+            ((100, 200, 50), 86),
         ])
         colors = extract_dominant_colors_segmented(path, n_colors=3)
         for c in colors:

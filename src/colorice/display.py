@@ -74,6 +74,11 @@ def preview_palette(scheme: ColorScheme, index: int, total: int) -> str:
 
 def interactive_select(schemes: list[ColorScheme]) -> ColorScheme:
     """Display all palettes and prompt user to select one."""
+    import sys
+
+    if not sys.stdin.isatty():
+        return schemes[0]
+
     for i, scheme in enumerate(schemes, 1):
         print(preview_palette(scheme, i, len(schemes)))
 
@@ -83,6 +88,8 @@ def interactive_select(schemes: list[ColorScheme]) -> ColorScheme:
             idx = int(choice) - 1
             if 0 <= idx < len(schemes):
                 return schemes[idx]
-        except (ValueError, EOFError):
+        except EOFError:
+            return schemes[0]
+        except ValueError:
             pass
         print(f"  Please enter a number between 1 and {len(schemes)}")

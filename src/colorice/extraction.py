@@ -21,9 +21,20 @@ def load_and_resize(path: str, max_pixels: int = 64_000) -> np.ndarray:
 
 def _load_image(path: str, max_pixels: int = 64_000) -> np.ndarray:
     """Load image, resize to ~max_pixels, return (H, W, 3) sRGB [0,1] array."""
-    img = Image.open(path).convert("RGB")
+    try:
+        img = Image.open(path)
+    except Exception as e:
+        raise SystemExit(f"Error: Cannot open image '{path}': {e}") from e
+
+    img = img.convert("RGB")
     w, h = img.size
     total = w * h
+
+    if w < 256 or h < 256:
+        raise SystemExit(
+            f"Error: Image '{path}' is too small ({w}x{h} pixels). "
+            "Minimum size is 256x256. Wallpaper-sized images work best."
+        )
 
     if total > max_pixels:
         scale = (max_pixels / total) ** 0.5
