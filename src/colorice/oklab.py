@@ -139,7 +139,9 @@ def gamut_clamp(lab: np.ndarray) -> np.ndarray:
     h = oklab_hue(lab)
 
     if C == 0:
-        return lab
+        # Achromatic — clamp L to valid sRGB range [0, 1]
+        clamped_L = float(np.clip(L, 0.0, 1.0))
+        return np.array([clamped_L, 0.0, 0.0])
 
     # Binary search on chroma
     lo, hi = 0.0, C
