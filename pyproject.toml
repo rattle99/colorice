@@ -18,6 +18,9 @@ colorice = "colorice.cli:main"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+colorice = ["data/templates/*"]
+
 [project.optional-dependencies]
 segment = [
     "scikit-image>=0.22",

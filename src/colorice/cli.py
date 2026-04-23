@@ -105,6 +105,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="List available mood names and exit",
     )
     parser.add_argument(
+        "--init",
+        action="store_true",
+        help="Install default templates to the template directory and exit",
+    )
+    parser.add_argument(
         "-v", "--version",
         action="version",
         version=f"colorice {__version__}",
@@ -167,6 +172,13 @@ def main() -> None:
     if args.list_moods:
         for name in MoodRegistry.list_names():
             print(name)
+        return
+
+    # Install default templates and exit
+    if args.init:
+        from .init_templates import install_default_templates
+        from .paths import default_template_dir
+        install_default_templates(default_template_dir(), quiet=args.quiet)
         return
 
     # Apply-only mode: no image, load existing scheme
