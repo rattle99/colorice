@@ -133,6 +133,6 @@ def test_chained_manipulation_order_matters(sample_scheme):
     variables = build_variables(sample_scheme, content)
     a = variables["color1.lighten_30.darken_10"]
     b = variables["color1.darken_10.lighten_30"]
-    # Due to gamut clamping, these will generally produce different results
-    # (lightening first may hit gamut ceiling, clamping changes the color)
-    assert a != b or True  # they may rarely be equal, so don't hard-fail
+    # Both keys should resolve to valid hex colors
+    assert a.startswith("#") and len(a) == 7
+    assert b.startswith("#") and len(b) == 7
