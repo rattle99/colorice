@@ -63,7 +63,7 @@ def load_config(path: str | None = None) -> ColoriceConfig:
         templates.append(
             TemplateMapping(
                 name=name,
-                input=t["input"],
+                input=os.path.expanduser(t["input"]),
                 output=os.path.expanduser(t["output"]),
                 hook=t.get("hook"),
             )
