@@ -6,7 +6,7 @@ import os
 import sys
 
 from . import __version__
-from .cache import get_cache_key_for_extraction, load_cached, save_cache
+from .cache import get_cache_key, load_cached, save_cache
 from .display import interactive_select
 from .paths import default_config_path, default_output_path
 from .extraction import (
@@ -150,11 +150,11 @@ def _apply_templates(scheme: ColorScheme, args: argparse.Namespace) -> None:
     config = load_config(args.config)
     if not config.templates:
         if not args.quiet:
-            print(f"  No templates configured. See {default_config_path()}")
+            print(f"  No templates configured. See {default_config_path()}", file=sys.stderr)
         return
 
     if not args.quiet:
-        print("  Applying templates...")
+        print("  Applying templates...", file=sys.stderr)
     apply_all_templates(
         scheme,
         config,
@@ -193,7 +193,7 @@ def main() -> None:
 
         selected = _load_scheme_from_file(output_path)
         if not args.quiet:
-            print(f"  Loaded scheme from {output_path}")
+            print(f"  Loaded scheme from {output_path}", file=sys.stderr)
         _apply_templates(selected, args)
         return
 
@@ -222,7 +222,7 @@ def main() -> None:
             break
 
     # Extract colors (with caching)
-    cache_key, _ = get_cache_key_for_extraction(
+    cache_key = get_cache_key(
         args.image,
         n_colors=args.colors,
         segment=args.segment,
@@ -231,10 +231,10 @@ def main() -> None:
 
     if dominant is not None:
         if not args.quiet:
-            print(f"  Using cached extraction for {args.image}")
+            print(f"  Using cached extraction for {args.image}", file=sys.stderr)
     else:
         if not args.quiet:
-            print(f"  Extracting colors from {args.image}...")
+            print(f"  Extracting colors from {args.image}...", file=sys.stderr)
 
         if args.segment:
             dominant = extract_dominant_colors_segmented(args.image, n_colors=args.colors)
@@ -283,7 +283,7 @@ def main() -> None:
         selected.write(args.output)
 
         if not args.quiet:
-            print(f"\n  Scheme written to {args.output}")
+            print(f"\n  Scheme written to {args.output}", file=sys.stderr)
 
     # Apply templates
     if args.apply or args.dry_run:

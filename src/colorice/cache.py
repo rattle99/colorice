@@ -44,7 +44,7 @@ def save_cache(key: str, colors: list[np.ndarray]) -> None:
         json.dump(data, f)
 
 
-def get_cache_key_for_extraction(
+def get_cache_key(
     image_path: str,
     n_colors: int,
     segment: bool,
@@ -52,16 +52,12 @@ def get_cache_key_for_extraction(
     max_pixels: int = 64_000,
     scale: int = 100,
     min_size: int = 50,
-) -> tuple[str, bytes]:
-    """Read image file and compute cache key.
-
-    Returns (cache_key, image_bytes) so the caller can pass bytes
-    to extraction without re-reading the file.
-    """
+) -> str:
+    """Read image file and compute cache key from contents + params."""
     with open(image_path, "rb") as f:
         image_bytes = f.read()
 
-    key = _cache_key(
+    return _cache_key(
         image_bytes,
         n_colors=n_colors,
         segment=segment,
@@ -70,4 +66,3 @@ def get_cache_key_for_extraction(
         scale=scale,
         min_size=min_size,
     )
-    return key, image_bytes

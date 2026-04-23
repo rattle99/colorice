@@ -8,7 +8,6 @@ from .oklab import (
     oklab_from_lch,
     oklab_hue,
     oklab_to_hex,
-    oklab_to_srgb,
     srgb_to_linear,
 )
 
@@ -66,8 +65,7 @@ def enforce_contrast(
     for _ in range(32):
         mid = (lo + hi) / 2
         candidate = oklab_from_lch(mid, C, h)
-        candidate_srgb = oklab_to_srgb(candidate.reshape(1, 3))[0]
-        candidate_hex = f"#{int(candidate_srgb[0]*255):02x}{int(candidate_srgb[1]*255):02x}{int(candidate_srgb[2]*255):02x}"
+        candidate_hex = oklab_to_hex(candidate)
 
         ratio = contrast_ratio(candidate_hex, bg_hex)
         if ratio >= min_ratio:
