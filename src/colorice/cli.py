@@ -6,7 +6,9 @@ import os
 import sys
 
 from . import __version__
+from .cache import get_cache_key_for_extraction, load_cached, save_cache
 from .display import interactive_select
+from .paths import default_config_path, default_output_path
 from .extraction import (
     extract_dominant_colors,
     extract_dominant_colors_segmented,
@@ -14,7 +16,7 @@ from .extraction import (
     load_and_resize,
 )
 from .moods import MoodRegistry
-from .palette import assign_ansi_roles
+from .palette import assign_ansi_roles, validate_palette
 from .scheme import ColorScheme
 
 
@@ -26,8 +28,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("image", nargs="?", default=None, help="Path to wallpaper image (PNG, JPG, WEBP)")
     parser.add_argument(
         "-o", "--output",
-        default=os.path.expanduser("~/.config/colorice/colors.json"),
-        help="Output JSON path (default: ~/.config/colorice/colors.json)",
+        default=default_output_path(),
+        help=f"Output JSON path (default: {default_output_path()})",
     )
     parser.add_argument(
         "-n", "--num-palettes",
@@ -85,7 +87,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--config",
         default=None,
-        help="Path to config.toml (default: ~/.config/colorice/config.toml)",
+        help=f"Path to config.toml (default: {default_config_path()})",
     )
     parser.add_argument(
         "--dry-run",
@@ -143,7 +145,7 @@ def _apply_templates(scheme: ColorScheme, args: argparse.Namespace) -> None:
     config = load_config(args.config)
     if not config.templates:
         if not args.quiet:
-            print("  No templates configured. See ~/.config/colorice/config.toml")
+            print(f"  No templates configured. See {default_config_path()}")
         return
 
     if not args.quiet:
@@ -207,15 +209,28 @@ def main() -> None:
         if not added:
             break
 
-    # Extract colors
-    if not args.quiet:
-        print(f"  Extracting colors from {args.image}...")
+    # Extract colors (with caching)
+    cache_key, _ = get_cache_key_for_extraction(
+        args.image,
+        n_colors=args.colors,
+        segment=args.segment,
+    )
+    dominant = load_cached(cache_key)
 
-    if args.segment:
-        dominant = extract_dominant_colors_segmented(args.image, n_colors=args.colors)
+    if dominant is not None:
+        if not args.quiet:
+            print(f"  Using cached extraction for {args.image}")
     else:
-        pixels = load_and_resize(args.image)
-        dominant = extract_dominant_colors(pixels, n_colors=args.colors)
+        if not args.quiet:
+            print(f"  Extracting colors from {args.image}...")
+
+        if args.segment:
+            dominant = extract_dominant_colors_segmented(args.image, n_colors=args.colors)
+        else:
+            pixels = load_and_resize(args.image)
+            dominant = extract_dominant_colors(pixels, n_colors=args.colors)
+
+        save_cache(cache_key, dominant)
 
     # Only fill hue gaps in semantic mode
     if args.semantic:
@@ -244,6 +259,12 @@ def main() -> None:
         selected = schemes[0]
     else:
         selected = interactive_select(schemes)
+
+    # Validate palette
+    if not args.quiet:
+        warnings = validate_palette(selected.colors)
+        for w in warnings:
+            print(w, file=sys.stderr)
 
     # Write output (skip if --dry-run)
     if not args.dry_run:

@@ -247,6 +247,37 @@ def _build_palette(
     return [oklab_to_hex(gamut_clamp(c)) for c in palette]
 
 
+ANSI_SLOT_NAMES = [
+    "color0 (black/bg)", "color1 (red)", "color2 (green)", "color3 (yellow)",
+    "color4 (blue)", "color5 (magenta)", "color6 (cyan)", "color7 (white/fg)",
+    "color8 (bright black)", "color9 (bright red)", "color10 (bright green)",
+    "color11 (bright yellow)", "color12 (bright blue)", "color13 (bright magenta)",
+    "color14 (bright cyan)", "color15 (bright white)",
+]
+
+
+def validate_palette(hex_colors: list[str], min_distance: float = 0.04) -> list[str]:
+    """Check pairwise Oklab distance between all 16 colors.
+
+    Returns a list of warning strings for pairs that are too similar.
+    """
+    from .oklab import hex_to_oklab
+
+    labs = [hex_to_oklab(c) for c in hex_colors]
+    warnings = []
+
+    for i in range(len(labs)):
+        for j in range(i + 1, len(labs)):
+            dist = float(np.linalg.norm(labs[i] - labs[j]))
+            if dist < min_distance:
+                warnings.append(
+                    f"  Warning: {ANSI_SLOT_NAMES[i]} and {ANSI_SLOT_NAMES[j]} "
+                    f"are very similar (distance {dist:.3f})"
+                )
+
+    return warnings
+
+
 def assign_ansi_roles(
     colors: list[np.ndarray],
     min_contrast: float = 7.0,

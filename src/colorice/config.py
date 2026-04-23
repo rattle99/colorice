@@ -4,6 +4,8 @@ import os
 import tomllib
 from dataclasses import dataclass, field
 
+from .paths import default_config_path, default_template_dir
+
 
 @dataclass
 class TemplateMapping:
@@ -19,13 +21,12 @@ class TemplateMapping:
 class ColoriceConfig:
     """Top-level configuration."""
 
-    template_dir: str = "~/.config/colorice/templates"
+    template_dir: str = ""
     templates: list[TemplateMapping] = field(default_factory=list)
 
-
-def default_config_path() -> str:
-    """Default config file location."""
-    return os.path.expanduser("~/.config/colorice/config.toml")
+    def __post_init__(self) -> None:
+        if not self.template_dir:
+            self.template_dir = default_template_dir()
 
 
 def load_config(path: str | None = None) -> ColoriceConfig:
@@ -46,9 +47,7 @@ def load_config(path: str | None = None) -> ColoriceConfig:
         except tomllib.TOMLDecodeError as e:
             raise ValueError(f"Invalid config file {config_path}: {e}") from e
 
-    template_dir = data.get("general", {}).get(
-        "template_dir", "~/.config/colorice/templates"
-    )
+    template_dir = data.get("general", {}).get("template_dir", "")
 
     templates = []
     for i, t in enumerate(data.get("templates", [])):
@@ -71,6 +70,6 @@ def load_config(path: str | None = None) -> ColoriceConfig:
         )
 
     return ColoriceConfig(
-        template_dir=os.path.expanduser(template_dir),
+        template_dir=os.path.expanduser(template_dir) if template_dir else "",
         templates=templates,
     )
