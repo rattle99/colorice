@@ -32,12 +32,6 @@ def build_parser() -> argparse.ArgumentParser:
         help=f"Output JSON path (default: {default_output_path()})",
     )
     parser.add_argument(
-        "-n", "--num-palettes",
-        type=int,
-        default=4,
-        help="Number of palette variants to generate (default: 4)",
-    )
-    parser.add_argument(
         "-m", "--moods",
         default="vibrant,muted,warm,cool",
         help="Comma-separated mood names (default: vibrant,muted,warm,cool)",
@@ -208,18 +202,6 @@ def main() -> None:
 
     # Parse moods
     mood_names = [m.strip() for m in args.moods.split(",")]
-    mood_names = mood_names[: args.num_palettes]
-
-    # Pad with defaults if fewer moods than requested palettes
-    default_moods = ["vibrant", "muted", "warm", "cool"]
-    while len(mood_names) < args.num_palettes:
-        added = False
-        for m in default_moods:
-            if m not in mood_names and len(mood_names) < args.num_palettes:
-                mood_names.append(m)
-                added = True
-        if not added:
-            break
 
     # Extract colors (with caching)
     cache_key = get_cache_key(

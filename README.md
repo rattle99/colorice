@@ -41,7 +41,6 @@ Extraction:
                             (requires scikit-image)
 
 Palette:
-  -n, --num-palettes N      Number of palette variants (default: 4)
   -m, --moods MOOD[,...]    Mood names (default: vibrant,muted,warm,cool)
   --min-contrast RATIO      Min fg/bg contrast ratio (default: 7.0)
   --semantic                Enforce ANSI color name conventions (red=red, etc.)
@@ -77,8 +76,8 @@ colorice ~/wallpapers/sunset.jpg --apply
 # Quiet mode, pipe JSON to stdout
 colorice ~/wallpapers/ocean.png -q -o -
 
-# Light theme with 2 palettes
-colorice wallpaper.jpg --light -n 2
+# Light theme with specific moods
+colorice wallpaper.jpg --light -m vibrant,cool
 
 # Region-aware extraction (better for complex images)
 colorice wallpaper.jpg --segment --apply
