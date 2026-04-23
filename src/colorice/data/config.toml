@@ -1,0 +1,111 @@
+# Colorice configuration
+# Uncomment and edit the templates you want to use.
+# Run `colorice --init` to install default template files.
+# Run `colorice <image> --apply` to render templates and run hooks.
+
+# ── Terminal emulators ────────────────────────────────────────────────────────
+
+# [[templates]]
+# name = "kitty"
+# input = "kitty.conf"
+# output = "~/.config/kitty/current-theme.conf"
+# hook = "killall -USR1 kitty"
+
+# [[templates]]
+# name = "alacritty"
+# input = "alacritty.toml"
+# output = "~/.config/alacritty/colorice-theme.toml"
+
+# [[templates]]
+# name = "foot"
+# input = "foot.ini"
+# output = "~/.config/foot/colorice-theme.ini"
+
+# [[templates]]
+# name = "ghostty"
+# input = "ghostty"
+# output = "~/.config/ghostty/colorice-colors"
+
+# [[templates]]
+# name = "wezterm"
+# input = "wezterm-colors.lua"
+# output = "~/.config/wezterm/colorice-colors.lua"
+
+# ── Window managers ───────────────────────────────────────────────────────────
+
+# [[templates]]
+# name = "hyprland"
+# input = "hyprland-colors.conf"
+# output = "~/.config/hypr/colorice-colors.conf"
+
+# [[templates]]
+# name = "i3"
+# input = "i3-colors.conf"
+# output = "~/.config/i3/colorice-colors.conf"
+
+# [[templates]]
+# name = "sway"
+# input = "sway-colors.conf"
+# output = "~/.config/sway/colorice-colors.conf"
+
+# ── Bars ──────────────────────────────────────────────────────────────────────
+
+# [[templates]]
+# name = "waybar"
+# input = "waybar-colors.css"
+# output = "~/.config/waybar/colorice-colors.css"
+
+# [[templates]]
+# name = "polybar"
+# input = "polybar-colors.ini"
+# output = "~/.config/polybar/colorice-colors.ini"
+
+# ── Notifications ─────────────────────────────────────────────────────────────
+
+# [[templates]]
+# name = "dunst"
+# input = "dunst.conf"
+# output = "~/.config/dunst/colorice-colors.conf"
+
+# [[templates]]
+# name = "mako"
+# input = "mako.conf"
+# output = "~/.config/mako/colorice-colors.conf"
+
+# ── Editors ───────────────────────────────────────────────────────────────────
+
+# [[templates]]
+# name = "neovim"
+# input = "neovim-colors.lua"
+# output = "~/.config/nvim/colors/colorice.lua"
+
+# [[templates]]
+# name = "vim"
+# input = "vim-colors.vim"
+# output = "~/.vim/colors/colorice.vim"
+
+# ── Multiplexers ──────────────────────────────────────────────────────────────
+
+# [[templates]]
+# name = "zellij"
+# input = "zellij-theme.kdl"
+# output = "~/.config/zellij/themes/colorice.kdl"
+
+# ── Lock screens ──────────────────────────────────────────────────────────────
+
+# [[templates]]
+# name = "swaylock"
+# input = "swaylock.conf"
+# output = "~/.config/swaylock/colorice-colors.conf"
+
+# ── Generic ───────────────────────────────────────────────────────────────────
+
+# [[templates]]
+# name = "xresources"
+# input = "xresources"
+# output = "~/.Xresources.d/colorice"
+
+# [[templates]]
+# name = "shell"
+# input = "colors.sh"
+# output = "~/.config/colorice/colors.sh"

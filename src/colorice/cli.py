@@ -168,10 +168,11 @@ def main() -> None:
             print(name)
         return
 
-    # Install default templates and exit
+    # Install default config and templates, then exit
     if args.init:
-        from .init_templates import install_default_templates
+        from .init_templates import install_default_config, install_default_templates
         from .paths import default_template_dir
+        install_default_config(quiet=args.quiet)
         install_default_templates(default_template_dir(), quiet=args.quiet)
         return
 
