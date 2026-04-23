@@ -24,15 +24,15 @@ def _load_image(path: str, max_pixels: int = 64_000) -> np.ndarray:
     try:
         img = Image.open(path)
     except Exception as e:
-        raise SystemExit(f"Error: Cannot open image '{path}': {e}") from e
+        raise ValueError(f"Cannot open image '{path}': {e}") from e
 
     img = img.convert("RGB")
     w, h = img.size
     total = w * h
 
     if w < 256 or h < 256:
-        raise SystemExit(
-            f"Error: Image '{path}' is too small ({w}x{h} pixels). "
+        raise ValueError(
+            f"Image '{path}' is too small ({w}x{h} pixels). "
             "Minimum size is 256x256. Wallpaper-sized images work best."
         )
 

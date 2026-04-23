@@ -4,26 +4,11 @@ import os
 import tempfile
 
 from colorice.config import ColoriceConfig, TemplateMapping
-from colorice.scheme import ColorScheme
 from colorice.templates.applicator import apply_all_templates
 
 
-def _sample_scheme() -> ColorScheme:
-    return ColorScheme(
-        wallpaper="/tmp/test.jpg",
-        mood="vibrant",
-        colors=[
-            "#191724", "#ff4971", "#2ecc71", "#f1c40f",
-            "#3498db", "#9b59b6", "#1abc9c", "#ecf0f1",
-            "#34495e", "#e74c3c", "#27ae60", "#f39c12",
-            "#2980b9", "#8e44ad", "#16a085", "#ffffff",
-        ],
-    )
-
-
-def test_apply_single_template():
+def test_apply_single_template(sample_scheme):
     """Should render template and write output file."""
-    scheme = _sample_scheme()
     with tempfile.TemporaryDirectory() as tmpdir:
         # Create template
         template_dir = os.path.join(tmpdir, "templates")
@@ -44,7 +29,7 @@ def test_apply_single_template():
             ],
         )
 
-        written = apply_all_templates(scheme, config, quiet=True)
+        written = apply_all_templates(sample_scheme, config, quiet=True)
         assert output_path in written
         assert os.path.isfile(output_path)
 
@@ -54,9 +39,8 @@ def test_apply_single_template():
         assert "fg=#ecf0f1" in content
 
 
-def test_missing_template_warns_no_crash():
+def test_missing_template_warns_no_crash(sample_scheme):
     """Missing template file should warn but not crash."""
-    scheme = _sample_scheme()
     config = ColoriceConfig(
         template_dir="/tmp/nonexistent_dir",
         templates=[
@@ -68,13 +52,12 @@ def test_missing_template_warns_no_crash():
         ],
     )
 
-    written = apply_all_templates(scheme, config, quiet=True)
+    written = apply_all_templates(sample_scheme, config, quiet=True)
     assert written == []
 
 
-def test_dry_run_no_write():
+def test_dry_run_no_write(sample_scheme):
     """dry_run should not create the output file."""
-    scheme = _sample_scheme()
     with tempfile.TemporaryDirectory() as tmpdir:
         template_dir = os.path.join(tmpdir, "templates")
         os.makedirs(template_dir)
@@ -94,14 +77,13 @@ def test_dry_run_no_write():
             ],
         )
 
-        written = apply_all_templates(scheme, config, dry_run=True, quiet=True)
+        written = apply_all_templates(sample_scheme, config, dry_run=True, quiet=True)
         assert written == []
         assert not os.path.isfile(output_path)
 
 
-def test_hook_failure_no_crash():
+def test_hook_failure_no_crash(sample_scheme):
     """Hook that fails should warn but not abort."""
-    scheme = _sample_scheme()
     with tempfile.TemporaryDirectory() as tmpdir:
         template_dir = os.path.join(tmpdir, "templates")
         os.makedirs(template_dir)
@@ -122,5 +104,5 @@ def test_hook_failure_no_crash():
             ],
         )
 
-        written = apply_all_templates(scheme, config, quiet=True)
+        written = apply_all_templates(sample_scheme, config, quiet=True)
         assert output_path in written  # template still applied despite hook failure

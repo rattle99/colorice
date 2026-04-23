@@ -1,7 +1,6 @@
 """Tests for template variable resolution."""
 
 from colorice.oklab import hex_to_oklab, oklab_chroma, oklab_lightness
-from colorice.scheme import ColorScheme
 from colorice.templates.variables import (
     _compute_manipulation,
     _format_modifiers,
@@ -9,23 +8,9 @@ from colorice.templates.variables import (
 )
 
 
-def _sample_scheme() -> ColorScheme:
-    return ColorScheme(
-        wallpaper="/tmp/test.jpg",
-        mood="vibrant",
-        colors=[
-            "#191724", "#ff4971", "#2ecc71", "#f1c40f",
-            "#3498db", "#9b59b6", "#1abc9c", "#ecf0f1",
-            "#34495e", "#e74c3c", "#27ae60", "#f39c12",
-            "#2980b9", "#8e44ad", "#16a085", "#ffffff",
-        ],
-    )
-
-
-def test_base_variables_present():
+def test_base_variables_present(sample_scheme):
     """Should have all 16 colors, special names, wallpaper, alpha."""
-    scheme = _sample_scheme()
-    variables = build_variables(scheme, "")
+    variables = build_variables(sample_scheme, "")
     for i in range(16):
         assert f"color{i}" in variables
     assert variables["background"] == "#191724"
@@ -99,58 +84,53 @@ def test_extreme_manipulation_produces_valid_hex():
     assert result.startswith("#") and len(result) == 7
 
 
-def test_manipulation_resolved_from_template():
+def test_manipulation_resolved_from_template(sample_scheme):
     """Manipulations should only be computed when found in template content."""
-    scheme = _sample_scheme()
     content = "bg: {color0.lighten_20}"
-    variables = build_variables(scheme, content)
+    variables = build_variables(sample_scheme, content)
     assert "color0.lighten_20" in variables
     # Manipulation not in template should not be computed
     assert "color0.darken_30" not in variables
 
 
-def test_composition_manipulation_plus_strip():
+def test_composition_manipulation_plus_strip(sample_scheme):
     """Should resolve {color0.lighten_20.strip} correctly."""
-    scheme = _sample_scheme()
     content = "val: {color0.lighten_20.strip}"
-    variables = build_variables(scheme, content)
+    variables = build_variables(sample_scheme, content)
     assert "color0.lighten_20.strip" in variables
     assert not variables["color0.lighten_20.strip"].startswith("#")
 
 
-def test_chained_manipulations():
+def test_chained_manipulations(sample_scheme):
     """Should apply multiple manipulations left to right."""
-    scheme = _sample_scheme()
     content = "val: {color1.lighten_20.desaturate_10}"
-    variables = build_variables(scheme, content)
+    variables = build_variables(sample_scheme, content)
     assert "color1.lighten_20.desaturate_10" in variables
 
     # Result should be lighter than original
-    original = hex_to_oklab(scheme.colors[1])
+    original = hex_to_oklab(sample_scheme.colors[1])
     result = hex_to_oklab(variables["color1.lighten_20.desaturate_10"])
     assert oklab_lightness(result) > oklab_lightness(original)
     # Result should be less chromatic than just lightened
     just_lightened = hex_to_oklab(
-        _compute_manipulation(scheme.colors[1], "lighten", 20)
+        _compute_manipulation(sample_scheme.colors[1], "lighten", 20)
     )
     assert oklab_chroma(result) < oklab_chroma(just_lightened)
 
 
-def test_chained_manipulations_with_format_modifier():
+def test_chained_manipulations_with_format_modifier(sample_scheme):
     """Should chain manipulations then apply format modifier."""
-    scheme = _sample_scheme()
     content = "val: {color4.lighten_20.saturate_10.strip}"
-    variables = build_variables(scheme, content)
+    variables = build_variables(sample_scheme, content)
     key = "color4.lighten_20.saturate_10.strip"
     assert key in variables
     assert not variables[key].startswith("#")
 
 
-def test_chained_manipulation_order_matters():
+def test_chained_manipulation_order_matters(sample_scheme):
     """lighten then darken should differ from darken then lighten."""
-    scheme = _sample_scheme()
     content = "a: {color1.lighten_30.darken_10} b: {color1.darken_10.lighten_30}"
-    variables = build_variables(scheme, content)
+    variables = build_variables(sample_scheme, content)
     a = variables["color1.lighten_30.darken_10"]
     b = variables["color1.darken_10.lighten_30"]
     # Due to gamut clamping, these will generally produce different results

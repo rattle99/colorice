@@ -16,22 +16,6 @@ from .oklab import (
     oklab_to_hex,
 )
 
-# ANSI slot names
-ANSI_ROLES = [
-    "black",     # 0 - background
-    "red",       # 1 - errors, deletions
-    "green",     # 2 - success, additions
-    "yellow",    # 3 - warnings
-    "blue",      # 4 - info, links
-    "magenta",   # 5 - keywords, special
-    "cyan",      # 6 - strings, secondary
-    "white",     # 7 - foreground
-    # 8-15: bright variants
-    "bright_black", "bright_red", "bright_green", "bright_yellow",
-    "bright_blue", "bright_magenta", "bright_cyan", "bright_white",
-]
-
-
 def _pick_background(colors: list[np.ndarray], light: bool = False) -> np.ndarray:
     """Pick background color: darkest (or lightest for light themes)."""
     if light:
@@ -282,7 +266,7 @@ def assign_ansi_roles(
     colors: list[np.ndarray],
     min_contrast: float = 7.0,
     light: bool = False,
-    semantic: bool = True,
+    semantic: bool = False,
 ) -> list[str]:
     """Assign 16 ANSI colors from extracted Oklab colors.
 

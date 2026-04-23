@@ -219,11 +219,15 @@ def main() -> None:
         if not args.quiet:
             print(f"  Extracting colors from {args.image}...", file=sys.stderr)
 
-        if args.segment:
-            dominant = extract_dominant_colors_segmented(args.image, n_colors=args.colors)
-        else:
-            pixels = load_and_resize(args.image)
-            dominant = extract_dominant_colors(pixels, n_colors=args.colors)
+        try:
+            if args.segment:
+                dominant = extract_dominant_colors_segmented(args.image, n_colors=args.colors)
+            else:
+                pixels = load_and_resize(args.image)
+                dominant = extract_dominant_colors(pixels, n_colors=args.colors)
+        except ValueError as e:
+            print(f"Error: {e}", file=sys.stderr)
+            sys.exit(1)
 
         save_cache(cache_key, dominant)
 
