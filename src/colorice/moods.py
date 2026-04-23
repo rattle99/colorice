@@ -82,11 +82,18 @@ class MutedMood(BaseMood):
         return result
 
 
+def _shortest_hue_shift(h: float, target: float) -> float:
+    """Compute the shortest signed rotation from h toward target on [0,360)."""
+    diff = (target - h + 180) % 360 - 180
+    return diff
+
+
 @MoodRegistry.register
 class WarmMood(BaseMood):
-    """Shift hues strongly toward warm tones."""
+    """Shift hues toward warm tones (red/orange/yellow center ~30)."""
 
     name = "warm"
+    _warm_center = 30.0  # red-orange
 
     def transform(self, colors: list[np.ndarray]) -> list[np.ndarray]:
         result = []
@@ -94,20 +101,24 @@ class WarmMood(BaseMood):
             L = float(c[0])
             C = oklab_chroma(c)
             h = oklab_hue(c)
-            if 120 <= h <= 300:
-                h = h - 60
-                C = C * 0.7
-            else:
+            shift = _shortest_hue_shift(h, self._warm_center)
+            # Pull 40% of the way toward warm center
+            h = (h + shift * 0.4) % 360
+            # Boost chroma for already-warm, reduce for cool
+            if abs(shift) < 90:
                 C = C * 1.4
-            result.append(gamut_clamp(oklab_from_lch(L, min(C, 0.35), h % 360)))
+            else:
+                C = C * 0.7
+            result.append(gamut_clamp(oklab_from_lch(L, min(C, 0.35), h)))
         return result
 
 
 @MoodRegistry.register
 class CoolMood(BaseMood):
-    """Shift hues strongly toward cool tones."""
+    """Shift hues toward cool tones (blue/cyan center ~220)."""
 
     name = "cool"
+    _cool_center = 220.0  # blue-cyan
 
     def transform(self, colors: list[np.ndarray]) -> list[np.ndarray]:
         result = []
@@ -115,10 +126,13 @@ class CoolMood(BaseMood):
             L = float(c[0])
             C = oklab_chroma(c)
             h = oklab_hue(c)
-            if h >= 300 or h <= 120:
-                h = h + 60
-                C = C * 0.7
-            else:
+            shift = _shortest_hue_shift(h, self._cool_center)
+            # Pull 40% of the way toward cool center
+            h = (h + shift * 0.4) % 360
+            # Boost chroma for already-cool, reduce for warm
+            if abs(shift) < 90:
                 C = C * 1.4
-            result.append(gamut_clamp(oklab_from_lch(L, min(C, 0.35), h % 360)))
+            else:
+                C = C * 0.7
+            result.append(gamut_clamp(oklab_from_lch(L, min(C, 0.35), h)))
         return result
