@@ -62,6 +62,7 @@ def enforce_contrast(
 
     # Binary search on L
     best = fg_lab.copy()
+    best_found = False
     for _ in range(32):
         mid = (lo + hi) / 2
         candidate = oklab_from_lch(mid, C, h)
@@ -70,6 +71,7 @@ def enforce_contrast(
         ratio = contrast_ratio(candidate_hex, bg_hex)
         if ratio >= min_ratio:
             best = candidate
+            best_found = True
             if bg_L < 0.5:
                 hi = mid  # try less lightness (closer to original)
             else:
@@ -79,6 +81,13 @@ def enforce_contrast(
                 lo = mid  # need more lightness
             else:
                 hi = mid
+
+    # If no color met the target, fall back to max contrast (white or black)
+    if not best_found:
+        if bg_L < 0.5:
+            best = oklab_from_lch(1.0, 0.0, 0.0)  # white
+        else:
+            best = oklab_from_lch(0.0, 0.0, 0.0)  # black
 
     return best
 
