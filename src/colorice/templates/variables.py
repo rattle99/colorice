@@ -20,10 +20,7 @@ from colorice.oklab import (
 from colorice.scheme import ColorScheme
 
 # Color names that support modifiers/manipulations
-_COLOR_NAMES = (
-    [f"color{i}" for i in range(16)]
-    + ["background", "foreground", "cursor"]
-)
+_COLOR_NAMES = [f"color{i}" for i in range(16)] + ["background", "foreground", "cursor"]
 
 # Regex to find manipulation requests, supporting chains:
 # {color0.lighten_20}, {color0.lighten_20.saturate_10}, {color0.lighten_20.strip}

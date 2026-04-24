@@ -9,16 +9,18 @@ from colorice.palette import assign_ansi_roles
 
 def _make_diverse_colors() -> list[np.ndarray]:
     """Create a diverse set of test colors."""
-    pixels = np.vstack([
-        np.tile([0.9, 0.1, 0.1], (100, 1)),   # red
-        np.tile([0.1, 0.8, 0.1], (100, 1)),    # green
-        np.tile([0.9, 0.9, 0.1], (100, 1)),    # yellow
-        np.tile([0.1, 0.2, 0.9], (100, 1)),    # blue
-        np.tile([0.8, 0.1, 0.8], (100, 1)),    # magenta
-        np.tile([0.1, 0.8, 0.8], (100, 1)),    # cyan
-        np.tile([0.05, 0.05, 0.05], (100, 1)), # dark
-        np.tile([0.95, 0.95, 0.95], (100, 1)), # light
-    ])
+    pixels = np.vstack(
+        [
+            np.tile([0.9, 0.1, 0.1], (100, 1)),  # red
+            np.tile([0.1, 0.8, 0.1], (100, 1)),  # green
+            np.tile([0.9, 0.9, 0.1], (100, 1)),  # yellow
+            np.tile([0.1, 0.2, 0.9], (100, 1)),  # blue
+            np.tile([0.8, 0.1, 0.8], (100, 1)),  # magenta
+            np.tile([0.1, 0.8, 0.8], (100, 1)),  # cyan
+            np.tile([0.05, 0.05, 0.05], (100, 1)),  # dark
+            np.tile([0.95, 0.95, 0.95], (100, 1)),  # light
+        ]
+    )
     dominant = extract_dominant_colors(pixels, n_colors=8)
     return fill_color_gaps(dominant)
 
@@ -54,6 +56,7 @@ def test_light_theme():
     palette = assign_ansi_roles(colors, light=True)
     # Background should be lighter than foreground
     from colorice.contrast import relative_luminance
+
     bg_lum = relative_luminance(palette[0])
     fg_lum = relative_luminance(palette[7])
     assert bg_lum > fg_lum, "Light theme bg should be lighter than fg"

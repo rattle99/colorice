@@ -87,11 +87,13 @@ def test_gamut_clamp_reduces_chroma():
 
 def test_srgb_batch_conversion():
     """Batch conversion should work for multiple colors."""
-    srgb = np.array([
-        [1.0, 0.0, 0.0],
-        [0.0, 1.0, 0.0],
-        [0.0, 0.0, 1.0],
-    ])
+    srgb = np.array(
+        [
+            [1.0, 0.0, 0.0],
+            [0.0, 1.0, 0.0],
+            [0.0, 0.0, 1.0],
+        ]
+    )
     oklab = srgb_to_oklab(srgb)
     assert oklab.shape == (3, 3)
     back = oklab_to_srgb(oklab)

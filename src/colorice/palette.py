@@ -16,6 +16,7 @@ from colorice.oklab import (
     oklab_to_hex,
 )
 
+
 def _pick_background(colors: list[np.ndarray], light: bool = False) -> np.ndarray:
     """Pick background color: darkest (or lightest for light themes)."""
     if light:
@@ -25,7 +26,9 @@ def _pick_background(colors: list[np.ndarray], light: bool = False) -> np.ndarra
         bg = min(colors, key=lambda c: float(c[0]))
         L = min(float(bg[0]), 0.15)
 
-    C = max(oklab_chroma(bg) * 0.7, 0.015)  # gentle reduction with chroma floor for visible tint
+    C = max(
+        oklab_chroma(bg) * 0.7, 0.015
+    )  # gentle reduction with chroma floor for visible tint
     h = oklab_hue(bg)
     return gamut_clamp(oklab_from_lch(L, C, h))
 
@@ -102,9 +105,9 @@ def _assign_semantic(
     fg = _pick_foreground(colors, bg, min_contrast, light)
 
     remaining = [
-        c for c in colors
-        if float(np.linalg.norm(c - bg)) > 0.05
-        and float(np.linalg.norm(c - fg)) > 0.05
+        c
+        for c in colors
+        if float(np.linalg.norm(c - bg)) > 0.05 and float(np.linalg.norm(c - fg)) > 0.05
     ]
     if not remaining:
         remaining = list(colors)
@@ -139,9 +142,9 @@ def _assign_aesthetic(
 
     # Filter out colors too close to bg/fg
     remaining = [
-        c for c in colors
-        if float(np.linalg.norm(c - bg)) > 0.05
-        and float(np.linalg.norm(c - fg)) > 0.05
+        c
+        for c in colors
+        if float(np.linalg.norm(c - bg)) > 0.05 and float(np.linalg.norm(c - fg)) > 0.05
     ]
     if not remaining:
         remaining = list(colors)
@@ -210,33 +213,44 @@ def _build_palette(
     bright_fg = enforce_contrast(bright_fg, bg, contrast_min)
 
     palette = [
-        bg,                    # 0
-        ansi_colors_lab[0],    # 1
-        ansi_colors_lab[1],    # 2
-        ansi_colors_lab[2],    # 3
-        ansi_colors_lab[3],    # 4
-        ansi_colors_lab[4],    # 5
-        ansi_colors_lab[5],    # 6
-        fg,                    # 7
-        bright_bg,             # 8
-        bright_colors[0],      # 9
-        bright_colors[1],      # 10
-        bright_colors[2],      # 11
-        bright_colors[3],      # 12
-        bright_colors[4],      # 13
-        bright_colors[5],      # 14
-        bright_fg,             # 15
+        bg,  # 0
+        ansi_colors_lab[0],  # 1
+        ansi_colors_lab[1],  # 2
+        ansi_colors_lab[2],  # 3
+        ansi_colors_lab[3],  # 4
+        ansi_colors_lab[4],  # 5
+        ansi_colors_lab[5],  # 6
+        fg,  # 7
+        bright_bg,  # 8
+        bright_colors[0],  # 9
+        bright_colors[1],  # 10
+        bright_colors[2],  # 11
+        bright_colors[3],  # 12
+        bright_colors[4],  # 13
+        bright_colors[5],  # 14
+        bright_fg,  # 15
     ]
 
     return [oklab_to_hex(gamut_clamp(c)) for c in palette]
 
 
 ANSI_SLOT_NAMES = [
-    "color0 (black/bg)", "color1 (red)", "color2 (green)", "color3 (yellow)",
-    "color4 (blue)", "color5 (magenta)", "color6 (cyan)", "color7 (white/fg)",
-    "color8 (bright black)", "color9 (bright red)", "color10 (bright green)",
-    "color11 (bright yellow)", "color12 (bright blue)", "color13 (bright magenta)",
-    "color14 (bright cyan)", "color15 (bright white)",
+    "color0 (black/bg)",
+    "color1 (red)",
+    "color2 (green)",
+    "color3 (yellow)",
+    "color4 (blue)",
+    "color5 (magenta)",
+    "color6 (cyan)",
+    "color7 (white/fg)",
+    "color8 (bright black)",
+    "color9 (bright red)",
+    "color10 (bright green)",
+    "color11 (bright yellow)",
+    "color12 (bright blue)",
+    "color13 (bright magenta)",
+    "color14 (bright cyan)",
+    "color15 (bright white)",
 ]
 
 

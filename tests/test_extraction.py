@@ -17,11 +17,13 @@ from colorice.oklab import srgb_to_oklab
 def test_extract_returns_correct_count():
     """Should return the requested number of colors."""
     # Create fake pixel data: red, green, blue blobs
-    pixels = np.vstack([
-        np.tile([1.0, 0.0, 0.0], (100, 1)),  # red
-        np.tile([0.0, 1.0, 0.0], (100, 1)),  # green
-        np.tile([0.0, 0.0, 1.0], (100, 1)),  # blue
-    ])
+    pixels = np.vstack(
+        [
+            np.tile([1.0, 0.0, 0.0], (100, 1)),  # red
+            np.tile([0.0, 1.0, 0.0], (100, 1)),  # green
+            np.tile([0.0, 0.0, 1.0], (100, 1)),  # blue
+        ]
+    )
     colors = extract_dominant_colors(pixels, n_colors=3)
     assert len(colors) == 3
 
@@ -29,11 +31,13 @@ def test_extract_returns_correct_count():
 def test_extract_sorted_by_dominance():
     """Most dominant cluster should be first."""
     # More red pixels than others
-    pixels = np.vstack([
-        np.tile([1.0, 0.0, 0.0], (500, 1)),  # red (dominant)
-        np.tile([0.0, 1.0, 0.0], (100, 1)),  # green
-        np.tile([0.0, 0.0, 1.0], (100, 1)),  # blue
-    ])
+    pixels = np.vstack(
+        [
+            np.tile([1.0, 0.0, 0.0], (500, 1)),  # red (dominant)
+            np.tile([0.0, 1.0, 0.0], (100, 1)),  # green
+            np.tile([0.0, 0.0, 1.0], (100, 1)),  # blue
+        ]
+    )
     colors = extract_dominant_colors(pixels, n_colors=3)
     # First color should be closest to red in Oklab
     red_oklab = srgb_to_oklab(np.array([[1.0, 0.0, 0.0]]))[0]
@@ -64,7 +68,9 @@ def test_fill_color_gaps_preserves_existing():
         assert any(np.allclose(orig, f, atol=0.001) for f in filled)
 
 
-def _make_test_image(path: str, regions: list[tuple[tuple[int,int,int], int]]) -> None:
+def _make_test_image(
+    path: str, regions: list[tuple[tuple[int, int, int], int]]
+) -> None:
     """Create a test image with colored blocks stacked vertically."""
     width = 256
     total_height = sum(h for _, h in regions)
@@ -82,12 +88,15 @@ def test_segmented_returns_correct_count():
     """Segmented extraction should return the requested number of colors."""
     with tempfile.TemporaryDirectory() as tmpdir:
         path = os.path.join(tmpdir, "test.png")
-        _make_test_image(path, [
-            ((255, 0, 0), 64),    # red
-            ((0, 255, 0), 64),    # green
-            ((0, 0, 255), 64),    # blue
-            ((255, 255, 0), 64),  # yellow
-        ])
+        _make_test_image(
+            path,
+            [
+                ((255, 0, 0), 64),  # red
+                ((0, 255, 0), 64),  # green
+                ((0, 0, 255), 64),  # blue
+                ((255, 255, 0), 64),  # yellow
+            ],
+        )
         colors = extract_dominant_colors_segmented(path, n_colors=4)
         assert len(colors) == 4
 
@@ -101,14 +110,18 @@ def test_segmented_finds_small_regions():
     with tempfile.TemporaryDirectory() as tmpdir:
         path = os.path.join(tmpdir, "test.png")
         # 90% blue sky, 10% red subject
-        _make_test_image(path, [
-            ((30, 60, 150), 230),   # large blue region
-            ((220, 40, 30), 26),    # small red region
-        ])
+        _make_test_image(
+            path,
+            [
+                ((30, 60, 150), 230),  # large blue region
+                ((220, 40, 30), 26),  # small red region
+            ],
+        )
         colors = extract_dominant_colors_segmented(path, n_colors=4)
         # Should have at least 2 distinct colors (not all blue)
         hexes = set()
         from colorice.oklab import oklab_to_hex
+
         for c in colors:
             hexes.add(oklab_to_hex(c))
         assert len(hexes) >= 2, f"Expected diverse colors, got {hexes}"
@@ -118,11 +131,14 @@ def test_segmented_all_colors_valid_oklab():
     """Segmented colors should be valid Oklab values."""
     with tempfile.TemporaryDirectory() as tmpdir:
         path = os.path.join(tmpdir, "test.png")
-        _make_test_image(path, [
-            ((200, 100, 50), 86),
-            ((50, 100, 200), 86),
-            ((100, 200, 50), 86),
-        ])
+        _make_test_image(
+            path,
+            [
+                ((200, 100, 50), 86),
+                ((50, 100, 200), 86),
+                ((100, 200, 50), 86),
+            ],
+        )
         colors = extract_dominant_colors_segmented(path, n_colors=3)
         for c in colors:
             assert np.all(np.isfinite(c)), f"Non-finite color: {c}"

@@ -25,19 +25,27 @@ def build_parser() -> argparse.ArgumentParser:
         prog="colorice",
         description="Generate terminal color schemes from wallpaper images.",
     )
-    parser.add_argument("image", nargs="?", default=None, help="Path to wallpaper image (PNG, JPG, WEBP)")
     parser.add_argument(
-        "-o", "--output",
+        "image",
+        nargs="?",
+        default=None,
+        help="Path to wallpaper image (PNG, JPG, WEBP)",
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
         default=default_output_path(),
         help=f"Output JSON path (default: {default_output_path()})",
     )
     parser.add_argument(
-        "-m", "--moods",
+        "-m",
+        "--moods",
         default="vibrant,muted,warm,cool",
         help="Comma-separated mood names (default: vibrant,muted,warm,cool)",
     )
     parser.add_argument(
-        "-c", "--colors",
+        "-c",
+        "--colors",
         type=int,
         default=8,
         help="Number of dominant colors to extract (3-16, default: 8)",
@@ -64,7 +72,8 @@ def build_parser() -> argparse.ArgumentParser:
         help="Generate light theme",
     )
     parser.add_argument(
-        "-q", "--quiet",
+        "-q",
+        "--quiet",
         action="store_true",
         help="Suppress preview output",
     )
@@ -74,7 +83,8 @@ def build_parser() -> argparse.ArgumentParser:
         help="Use Felzenszwalb segmentation for region-aware extraction",
     )
     parser.add_argument(
-        "-a", "--apply",
+        "-a",
+        "--apply",
         action="store_true",
         help="Apply color scheme to configured templates",
     )
@@ -104,7 +114,8 @@ def build_parser() -> argparse.ArgumentParser:
         help="Install default templates to the template directory and exit",
     )
     parser.add_argument(
-        "-v", "--version",
+        "-v",
+        "--version",
         action="version",
         version=f"colorice {__version__}",
     )
@@ -125,7 +136,10 @@ def _load_scheme_from_file(path: str) -> ColorScheme:
     for i in range(16):
         key = f"color{i}"
         if key not in colors_data:
-            print(f"Error: Missing '{key}' in {path}. Expected 16 colors (color0-color15).", file=sys.stderr)
+            print(
+                f"Error: Missing '{key}' in {path}. Expected 16 colors (color0-color15).",
+                file=sys.stderr,
+            )
             sys.exit(1)
         colors.append(colors_data[key])
 
@@ -144,7 +158,10 @@ def _apply_templates(scheme: ColorScheme, args: argparse.Namespace) -> None:
     config = load_config(args.config)
     if not config.templates:
         if not args.quiet:
-            print(f"  No templates configured. See {default_config_path()}", file=sys.stderr)
+            print(
+                f"  No templates configured. See {default_config_path()}",
+                file=sys.stderr,
+            )
         return
 
     if not args.quiet:
@@ -170,8 +187,12 @@ def main() -> None:
 
     # Install default config and templates, then exit
     if args.init:
-        from colorice.init_templates import install_default_config, install_default_templates
+        from colorice.init_templates import (
+            install_default_config,
+            install_default_templates,
+        )
         from colorice.paths import default_template_dir
+
         install_default_config(quiet=args.quiet)
         install_default_templates(default_template_dir(), quiet=args.quiet)
         return
@@ -183,7 +204,10 @@ def main() -> None:
 
         output_path = os.path.expanduser(args.output)
         if not os.path.isfile(output_path):
-            print(f"Error: No scheme found at {output_path}. Generate one first.", file=sys.stderr)
+            print(
+                f"Error: No scheme found at {output_path}. Generate one first.",
+                file=sys.stderr,
+            )
             sys.exit(1)
 
         selected = _load_scheme_from_file(output_path)
@@ -221,7 +245,9 @@ def main() -> None:
 
         try:
             if args.segment:
-                dominant = extract_dominant_colors_segmented(args.image, n_colors=args.colors)
+                dominant = extract_dominant_colors_segmented(
+                    args.image, n_colors=args.colors
+                )
             else:
                 pixels = load_and_resize(args.image)
                 dominant = extract_dominant_colors(pixels, n_colors=args.colors)

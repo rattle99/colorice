@@ -13,11 +13,11 @@ from colorice.oklab import oklab_chroma, srgb_to_oklab
 def _sample_colors() -> list[np.ndarray]:
     """Mixed hue colors at moderate saturation."""
     return [
-        srgb_to_oklab(np.array([[0.8, 0.2, 0.2]]))[0],   # red
-        srgb_to_oklab(np.array([[0.2, 0.7, 0.3]]))[0],    # green
-        srgb_to_oklab(np.array([[0.3, 0.3, 0.8]]))[0],    # blue
-        srgb_to_oklab(np.array([[0.7, 0.7, 0.2]]))[0],    # yellow
-        srgb_to_oklab(np.array([[0.1, 0.1, 0.1]]))[0],    # dark
+        srgb_to_oklab(np.array([[0.8, 0.2, 0.2]]))[0],  # red
+        srgb_to_oklab(np.array([[0.2, 0.7, 0.3]]))[0],  # green
+        srgb_to_oklab(np.array([[0.3, 0.3, 0.8]]))[0],  # blue
+        srgb_to_oklab(np.array([[0.7, 0.7, 0.2]]))[0],  # yellow
+        srgb_to_oklab(np.array([[0.1, 0.1, 0.1]]))[0],  # dark
     ]
 
 
@@ -47,9 +47,9 @@ def test_warm_shifts_hues_warm():
     """Warm mood should shift average hue toward warm (lower hue angles)."""
     # Use only cool colors so the shift is measurable
     cool_colors = [
-        srgb_to_oklab(np.array([[0.2, 0.6, 0.8]]))[0],   # cyan
-        srgb_to_oklab(np.array([[0.3, 0.3, 0.9]]))[0],    # blue
-        srgb_to_oklab(np.array([[0.2, 0.8, 0.4]]))[0],    # green
+        srgb_to_oklab(np.array([[0.2, 0.6, 0.8]]))[0],  # cyan
+        srgb_to_oklab(np.array([[0.3, 0.3, 0.9]]))[0],  # blue
+        srgb_to_oklab(np.array([[0.2, 0.8, 0.4]]))[0],  # green
     ]
     mood = MoodRegistry.get("warm")
     transformed = mood.transform(cool_colors)
@@ -62,9 +62,9 @@ def test_warm_shifts_hues_warm():
 def test_cool_shifts_hues_cool():
     """Cool mood should shift warm colors toward cool."""
     warm_colors = [
-        srgb_to_oklab(np.array([[0.9, 0.2, 0.1]]))[0],   # red
-        srgb_to_oklab(np.array([[0.9, 0.7, 0.1]]))[0],    # orange/yellow
-        srgb_to_oklab(np.array([[0.8, 0.3, 0.5]]))[0],    # pink
+        srgb_to_oklab(np.array([[0.9, 0.2, 0.1]]))[0],  # red
+        srgb_to_oklab(np.array([[0.9, 0.7, 0.1]]))[0],  # orange/yellow
+        srgb_to_oklab(np.array([[0.8, 0.3, 0.5]]))[0],  # pink
     ]
     mood = MoodRegistry.get("cool")
     transformed = mood.transform(warm_colors)

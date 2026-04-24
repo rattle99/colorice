@@ -1,8 +1,6 @@
 # Colorice
 
-Generate terminal color schemes from wallpaper images.
-
-Colorice extracts dominant colors from an image using perceptually uniform Oklab color space, builds a complete 16-color ANSI palette, and enforces WCAG contrast ratios for readability. It generates multiple mood variants (vibrant, muted, warm, cool), lets you pick the one you like, and applies it directly to your tools via a pywal-compatible template engine.
+Colorice is a modern alternative to pywal that uses Oklab color space for perceptually accurate color extraction, generates multiple mood variants (vibrant, muted, warm, cool) to preview and select from, enforces WCAG contrast ratios, and applies schemes across your full desktop rice via a pywal-compatible template engine with color manipulation filters.
 
 ## Install
 
