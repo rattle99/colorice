@@ -8,8 +8,8 @@ and colorice color manipulation filters (.lighten_20, .darken_15, etc.).
 import os
 import re
 
-from ..scheme import ColorScheme
-from .variables import build_variables
+from colorice.scheme import ColorScheme
+from colorice.templates.variables import build_variables
 
 # Matches {placeholder} but not escaped {{ or }}
 _PLACEHOLDER_RE = re.compile(r"\{([a-zA-Z_][a-zA-Z0-9_.]*)\}")

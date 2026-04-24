@@ -7,7 +7,7 @@ color manipulation filters.
 
 import re
 
-from ..oklab import (
+from colorice.oklab import (
     gamut_clamp,
     hex_to_oklab,
     hex_to_srgb,
@@ -17,7 +17,7 @@ from ..oklab import (
     oklab_lightness,
     oklab_to_hex,
 )
-from ..scheme import ColorScheme
+from colorice.scheme import ColorScheme
 
 # Color names that support modifiers/manipulations
 _COLOR_NAMES = (

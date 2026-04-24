@@ -4,7 +4,7 @@ import os
 import tomllib
 from dataclasses import dataclass, field
 
-from .paths import default_config_path, default_template_dir
+from colorice.paths import default_config_path, default_template_dir
 
 
 @dataclass

@@ -1,7 +1,7 @@
 """Terminal palette preview using ANSI 24-bit escape codes."""
 
-from .oklab import hex_to_srgb
-from .scheme import ColorScheme
+from colorice.oklab import hex_to_srgb
+from colorice.scheme import ColorScheme
 
 # Each color block is 6 chars wide, 8 blocks = 48 chars
 BLOCK_WIDTH = 6

@@ -7,7 +7,7 @@ Without these, a mood could silently do nothing or shift the wrong way.
 import numpy as np
 
 from colorice.moods import MoodRegistry
-from colorice.oklab import hex_to_oklab, oklab_chroma, oklab_hue, srgb_to_oklab
+from colorice.oklab import oklab_chroma, srgb_to_oklab
 
 
 def _sample_colors() -> list[np.ndarray]:

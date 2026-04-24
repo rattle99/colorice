@@ -1,7 +1,6 @@
 """Tests for Oklab color space conversions."""
 
 import numpy as np
-import pytest
 
 from colorice.oklab import (
     gamut_clamp,
@@ -12,7 +11,6 @@ from colorice.oklab import (
     oklab_hue,
     oklab_lightness,
     oklab_to_hex,
-    srgb_to_hex,
     srgb_to_oklab,
     oklab_to_srgb,
 )

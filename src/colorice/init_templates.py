@@ -7,7 +7,7 @@ import importlib.resources
 import os
 import shutil
 
-from .paths import default_config_path
+from colorice.paths import default_config_path
 
 
 def install_default_config(quiet: bool = False) -> bool:
@@ -29,7 +29,7 @@ def install_default_config(quiet: bool = False) -> bool:
 
     if not quiet:
         print(f"  Installed default config: {dest}")
-        print(f"  Uncomment the templates you want to use.")
+        print("  Uncomment the templates you want to use.")
 
     return True
 
@@ -63,10 +63,10 @@ def install_default_templates(template_dir: str, quiet: bool = False) -> list[st
             for name in installed:
                 print(f"    + {name}")
         if skipped:
-            print(f"  Already exist (skipped):")
+            print("  Already exist (skipped):")
             for name in skipped:
                 print(f"    ~ {name}")
         if not installed and not skipped:
-            print(f"  No templates found in package.")
+            print("  No templates found in package.")
 
     return installed

@@ -6,9 +6,9 @@ with proper semantic roles.
 
 import numpy as np
 
-from .contrast import enforce_contrast, ensure_distinguishable
-from .extraction import HUE_CENTERS, HUE_SECTORS, _hue_in_sector
-from .oklab import (
+from colorice.contrast import enforce_contrast, ensure_distinguishable
+from colorice.extraction import HUE_CENTERS, HUE_SECTORS, _hue_in_sector
+from colorice.oklab import (
     gamut_clamp,
     oklab_chroma,
     oklab_from_lch,

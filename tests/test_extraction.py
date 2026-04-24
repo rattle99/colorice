@@ -11,7 +11,7 @@ from colorice.extraction import (
     extract_dominant_colors_segmented,
     fill_color_gaps,
 )
-from colorice.oklab import oklab_hue, srgb_to_oklab
+from colorice.oklab import srgb_to_oklab
 
 
 def test_extract_returns_correct_count():

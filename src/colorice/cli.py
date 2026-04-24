@@ -5,19 +5,19 @@ import json
 import os
 import sys
 
-from . import __version__
-from .cache import get_cache_key, load_cached, save_cache
-from .display import interactive_select
-from .paths import default_config_path, default_output_path
-from .extraction import (
+from colorice import __version__
+from colorice.cache import get_cache_key, load_cached, save_cache
+from colorice.display import interactive_select
+from colorice.paths import default_config_path, default_output_path
+from colorice.extraction import (
     extract_dominant_colors,
     extract_dominant_colors_segmented,
     fill_color_gaps,
     load_and_resize,
 )
-from .moods import MoodRegistry
-from .palette import assign_ansi_roles, validate_palette
-from .scheme import ColorScheme
+from colorice.moods import MoodRegistry
+from colorice.palette import assign_ansi_roles, validate_palette
+from colorice.scheme import ColorScheme
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -138,8 +138,8 @@ def _load_scheme_from_file(path: str) -> ColorScheme:
 
 def _apply_templates(scheme: ColorScheme, args: argparse.Namespace) -> None:
     """Apply scheme to configured templates."""
-    from .config import load_config
-    from .templates.applicator import apply_all_templates
+    from colorice.config import load_config
+    from colorice.templates.applicator import apply_all_templates
 
     config = load_config(args.config)
     if not config.templates:
@@ -170,8 +170,8 @@ def main() -> None:
 
     # Install default config and templates, then exit
     if args.init:
-        from .init_templates import install_default_config, install_default_templates
-        from .paths import default_template_dir
+        from colorice.init_templates import install_default_config, install_default_templates
+        from colorice.paths import default_template_dir
         install_default_config(quiet=args.quiet)
         install_default_templates(default_template_dir(), quiet=args.quiet)
         return

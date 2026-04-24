@@ -6,7 +6,7 @@ import os
 
 import numpy as np
 
-from .paths import cache_dir
+from colorice.paths import cache_dir
 
 
 def _cache_key(image_bytes: bytes, **params: object) -> str:

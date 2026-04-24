@@ -8,9 +8,9 @@ import os
 import subprocess
 import sys
 
-from ..config import ColoriceConfig
-from ..scheme import ColorScheme
-from .pywal_compat import apply_template
+from colorice.config import ColoriceConfig
+from colorice.scheme import ColorScheme
+from colorice.templates.pywal_compat import apply_template
 
 
 def apply_all_templates(

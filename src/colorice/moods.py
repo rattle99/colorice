@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
-from .oklab import gamut_clamp, oklab_chroma, oklab_from_lch, oklab_hue
+from colorice.oklab import gamut_clamp, oklab_chroma, oklab_from_lch, oklab_hue
 
 
 class BaseMood(ABC):

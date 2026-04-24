@@ -5,7 +5,6 @@ import numpy as np
 from colorice.contrast import contrast_ratio
 from colorice.extraction import extract_dominant_colors, fill_color_gaps
 from colorice.palette import assign_ansi_roles
-from colorice.oklab import srgb_to_oklab
 
 
 def _make_diverse_colors() -> list[np.ndarray]:

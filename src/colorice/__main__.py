@@ -1,5 +1,5 @@
 """Entry point for python -m colorice."""
 
-from .cli import main
+from colorice.cli import main
 
 main()

@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from .oklab import (
+from colorice.oklab import (
     hex_to_srgb,
     oklab_chroma,
     oklab_from_lch,

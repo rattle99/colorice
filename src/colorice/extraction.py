@@ -10,7 +10,7 @@ import numpy as np
 from PIL import Image
 from sklearn.cluster import KMeans
 
-from .oklab import oklab_chroma, oklab_from_lch, oklab_hue, srgb_to_oklab
+from colorice.oklab import oklab_chroma, oklab_from_lch, oklab_hue, srgb_to_oklab
 
 
 def load_and_resize(path: str, max_pixels: int = 64_000) -> np.ndarray:
