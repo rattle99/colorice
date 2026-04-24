@@ -71,7 +71,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--segment",
         action="store_true",
-        help="Use Felzenszwalb segmentation for region-aware extraction (requires scikit-image)",
+        help="Use Felzenszwalb segmentation for region-aware extraction",
     )
     parser.add_argument(
         "-a", "--apply",

@@ -8,9 +8,6 @@ Colorice extracts dominant colors from an image using perceptually uniform Oklab
 
 ```bash
 pip install -e .
-
-# With Felzenszwalb segmentation support
-pip install -e ".[segment]"
 ```
 
 ## Quick start
@@ -38,7 +35,6 @@ colorice <image> [options]
 Extraction:
   -c, --colors N            Dominant colors to extract (3-16, default: 8)
   --segment                 Region-aware extraction via Felzenszwalb segmentation
-                            (requires scikit-image)
 
 Palette:
   -m, --moods MOOD[,...]    Mood names (default: vibrant,muted,warm,cool)
