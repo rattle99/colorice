@@ -1,11 +1,19 @@
 # Colorice
 
-Colorice is a modern alternative to pywal that uses Oklab color space for perceptually accurate color extraction, generates multiple mood variants (vibrant, muted, warm, cool) to preview and select from, enforces WCAG contrast ratios, and applies schemes across your full desktop rice via a pywal-compatible template engine with color manipulation filters.
+Colorice is a modern alternative to pywal that uses Oklab color space for perceptually accurate color extraction, generates multiple mood variants (vibrant, muted, warm, cool) to preview and select from, enforces WCAG contrast ratios, and applies schemes across your full desktop rice via a pywal-compatible template engine(yes existing pywal templates work) with color manipulation filters.
 
 ## Install
 
+Requires Python 3.11+.
+
 ```bash
-pip install -e .
+pipx install colorice
+```
+
+Or with pip:
+
+```bash
+pip install colorice
 ```
 
 ## Quick start
@@ -174,6 +182,12 @@ Respects `$XDG_CONFIG_HOME`, `$XDG_DATA_HOME`, and `$XDG_CACHE_HOME`.
 ## Development
 
 ```bash
+git clone https://github.com/rattle99/colorice.git
+cd colorice
 pip install -e ".[dev]"
 pytest
 ```
+
+## License
+
+GPL-3.0

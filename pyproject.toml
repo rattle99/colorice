@@ -17,7 +17,6 @@ classifiers = [
     "Development Status :: 4 - Beta",
     "Environment :: Console",
     "Intended Audience :: End Users/Desktop",
-    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     "Operating System :: POSIX :: Linux",
     "Operating System :: MacOS",
     "Programming Language :: Python :: 3",
@@ -35,9 +34,9 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/rattle99/coloricer"
-Repository = "https://github.com/rattle99/coloricer"
-Issues = "https://github.com/rattle99/coloricer/issues"
+Homepage = "https://github.com/rattle99/colorice"
+Repository = "https://github.com/rattle99/colorice"
+Issues = "https://github.com/rattle99/colorice/issues"
 
 [project.scripts]
 colorice = "colorice.cli:main"
