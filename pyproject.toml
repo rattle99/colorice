@@ -50,4 +50,6 @@ colorice = ["data/config.toml", "data/templates/*"]
 [project.optional-dependencies]
 dev = [
     "pytest>=7.0",
+    "build",
+    "twine",
 ]
