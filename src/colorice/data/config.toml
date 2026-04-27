@@ -98,6 +98,13 @@
 # input = "swaylock.conf"
 # output = "~/.config/swaylock/colorice-colors.conf"
 
+# ── Audio visualizers ─────────────────────────────────────────────────────────
+
+# [[templates]]
+# name = "cava"
+# input = "cava.conf"
+# output = "~/.config/cava/colorice-colors.conf"
+
 # ── Generic ───────────────────────────────────────────────────────────────────
 
 # [[templates]]

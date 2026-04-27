@@ -102,7 +102,7 @@ Colorice includes a pywal-compatible template engine. Templates use `{color0}` t
 colorice --init
 ```
 
-This copies templates to `~/.config/colorice/templates/` for: kitty, alacritty, foot, ghostty, wezterm, hyprland, i3, sway, rofi, dunst, mako, waybar, polybar, swaylock, zellij, neovim, vim, xresources, and shell variables.
+This copies templates to `~/.config/colorice/templates/` for: kitty, alacritty, foot, ghostty, wezterm, hyprland, i3, sway, rofi, dunst, mako, waybar, polybar, swaylock, zellij, neovim, vim, cava, xresources, and shell variables.
 
 ### Configuration
 
