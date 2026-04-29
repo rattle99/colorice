@@ -10,13 +10,13 @@ import shutil
 from colorice.paths import default_config_path
 
 
-def install_default_config(quiet: bool = False) -> bool:
-    """Copy bundled config.toml if one doesn't exist.
+def install_default_config(quiet: bool = False, force: bool = False) -> bool:
+    """Copy bundled config.toml if one doesn't exist (or force-overwrite).
 
     Returns True if installed, False if skipped.
     """
     dest = default_config_path()
-    if os.path.isfile(dest):
+    if os.path.isfile(dest) and not force:
         if not quiet:
             print(f"  Config already exists: {dest}")
         return False
@@ -28,16 +28,20 @@ def install_default_config(quiet: bool = False) -> bool:
         shutil.copy2(src_path, dest)
 
     if not quiet:
-        print(f"  Installed default config: {dest}")
-        print("  Uncomment the templates you want to use.")
+        action = "Reset" if force else "Installed"
+        print(f"  {action} default config: {dest}")
+        if not force:
+            print("  Uncomment the templates you want to use.")
 
     return True
 
 
-def install_default_templates(template_dir: str, quiet: bool = False) -> list[str]:
-    """Copy bundled templates to template_dir, skipping existing files.
+def install_default_templates(
+    template_dir: str, quiet: bool = False, force: bool = False
+) -> list[str]:
+    """Copy bundled templates to template_dir, skipping existing files unless force.
 
-    Returns list of newly installed template names.
+    Returns list of newly installed/overwritten template names.
     """
     os.makedirs(template_dir, exist_ok=True)
 
@@ -49,9 +53,9 @@ def install_default_templates(template_dir: str, quiet: bool = False) -> list[st
         name = resource.name
         dest = os.path.join(template_dir, name)
 
-        if os.path.isfile(dest):
+        if os.path.isfile(dest) and not force:
             skipped.append(name)
-            continue  # never overwrite user edits
+            continue
 
         with importlib.resources.as_file(resource) as src_path:
             shutil.copy2(src_path, dest)
@@ -59,7 +63,8 @@ def install_default_templates(template_dir: str, quiet: bool = False) -> list[st
 
     if not quiet:
         if installed:
-            print(f"  Installed templates to {template_dir}:")
+            action = "Reset" if force else "Installed"
+            print(f"  {action} templates to {template_dir}:")
             for name in installed:
                 print(f"    + {name}")
         if skipped:

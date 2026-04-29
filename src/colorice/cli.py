@@ -114,6 +114,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="Install default templates to the template directory and exit",
     )
     parser.add_argument(
+        "--force",
+        action="store_true",
+        help="With --init: overwrite existing config and templates with bundled defaults",
+    )
+    parser.add_argument(
         "-v",
         "--version",
         action="version",
@@ -193,8 +198,19 @@ def main() -> None:
         )
         from colorice.paths import default_template_dir
 
-        install_default_config(quiet=args.quiet)
-        install_default_templates(default_template_dir(), quiet=args.quiet)
+        force = args.force
+        if force:
+            print(
+                "This will overwrite your config.toml and all templates in "
+                f"{default_template_dir()} with the bundled defaults."
+            )
+            answer = input("Continue? [y/N] ").strip().lower()
+            if answer != "y":
+                print("Aborted.")
+                return
+
+        install_default_config(quiet=args.quiet, force=force)
+        install_default_templates(default_template_dir(), quiet=args.quiet, force=force)
         return
 
     # Apply-only mode: no image, load existing scheme
