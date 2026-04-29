@@ -75,7 +75,8 @@
 # [[templates]]
 # name = "dunst"
 # input = "dunst.conf"
-# output = "~/.config/dunst/colorice-colors.conf"
+# output = "~/.config/dunst/dunstrc"
+# hook = "systemctl --user restart dunst"
 
 # [[templates]]
 # name = "mako"
@@ -88,6 +89,7 @@
 # name = "neovim"
 # input = "neovim-colors.lua"
 # output = "~/.config/nvim/colors/colorice.lua"
+# hook = "for s in $XDG_RUNTIME_DIR/nvim.*.0; do [ -S \"$s\" ] && nvim --server \"$s\" --remote-send \"<ESC>:colorscheme colorice<CR>\" 2>/dev/null; done; true"
 
 # [[templates]]
 # name = "vim"
