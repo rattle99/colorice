@@ -188,8 +188,8 @@ def _build_palette(
     else:
         bright_bg[0] = min(1.0, bright_bg[0] + 0.15)
     # color8 is used for subdued text (prompt secondary, comments) —
-    # enforce readable contrast (3:1) so it's never invisible against bg
-    bright_bg = enforce_contrast(bright_bg, bg, 3.0)
+    # enforce WCAG AA contrast (4.5:1) so it's readable as normal-size text
+    bright_bg = enforce_contrast(bright_bg, bg, 4.5)
 
     bright_colors = []
     for c in ansi_colors_lab:
