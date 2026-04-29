@@ -68,7 +68,7 @@
 # name = "picom"
 # input = "picom.conf"
 # output = "~/.config/picom.conf"
-# hook = "pgrep picom >/dev/null && pkill -HUP picom || true"
+# hook = "pkill -q picom; sleep 0.5 && picom --daemon"  # increase sleep on slower machines if picom fails to restart
 
 # ── Notifications ─────────────────────────────────────────────────────────────
 
