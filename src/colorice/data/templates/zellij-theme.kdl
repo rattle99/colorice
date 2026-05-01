@@ -14,6 +14,7 @@ themes {{
         magenta "{color5}"
         cyan    "{color6}"
         white   "{color7}"
-        orange  "{color3}"
+        // color3 is yellow per ANSI convention; derive orange from red instead
+        orange  "{color1.lighten_10}"
     }}
 }}
