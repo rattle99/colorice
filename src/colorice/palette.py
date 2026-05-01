@@ -191,13 +191,19 @@ def _build_palette(
     # enforce WCAG AA contrast (4.5:1) so it's readable as normal-size text
     bright_bg = enforce_contrast(bright_bg, bg, 4.5)
 
+    # Cap bright L away from the gamut extremes — at L≈1.0 with high chroma,
+    # gamut_clamp pulls saturated colors toward pure white and bright_fg also
+    # ends up at white, causing color14 and color15 to collapse to the same hex.
+    bright_L_max = 0.92
+    bright_L_min = 0.08
+
     bright_colors = []
     for c in ansi_colors_lab:
         bc = c.copy()
         if light:
-            bc[0] = max(0.0, bc[0] - 0.10)
+            bc[0] = max(bright_L_min, bc[0] - 0.10)
         else:
-            bc[0] = min(1.0, bc[0] + 0.10)
+            bc[0] = min(bright_L_max, bc[0] + 0.10)
         C = oklab_chroma(bc)
         h = oklab_hue(bc)
         bc = oklab_from_lch(float(bc[0]), C * 1.1, h)
@@ -206,9 +212,9 @@ def _build_palette(
 
     bright_fg = fg.copy()
     if light:
-        bright_fg[0] = max(0.0, bright_fg[0] - 0.08)
+        bright_fg[0] = max(bright_L_min, bright_fg[0] - 0.08)
     else:
-        bright_fg[0] = min(1.0, bright_fg[0] + 0.08)
+        bright_fg[0] = min(bright_L_max, bright_fg[0] + 0.08)
     # color15 should always be readable against bg
     bright_fg = enforce_contrast(bright_fg, bg, contrast_min)
 
