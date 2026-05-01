@@ -112,11 +112,11 @@
 
 # ── Audio visualizers ─────────────────────────────────────────────────────────
 
-# [[templates]]
-# name = "cava"
-# input = "cava.conf"
-# output = "~/.config/cava/themes/colorice.cava"
-# hook = "pgrep cava >/dev/null && pkill -USR2 cava || true"
+[[templates]]
+name = "cava"
+input = "cava.conf"
+output = "~/.config/cava/config"
+hook = "pgrep cava >/dev/null && pkill -USR2 cava || true"
 
 # ── Generic ───────────────────────────────────────────────────────────────────
 
