@@ -20,11 +20,16 @@ from colorice.oklab import (
 def _pick_background(colors: list[np.ndarray], light: bool = False) -> np.ndarray:
     """Pick background color: darkest (or lightest for light themes)."""
     if light:
+        # Floor at 0.93 (the wallpaper's lightest is at least this bright);
+        # cap at 0.97 so bg isn't pure white — leaves room for bright_fg above it.
         bg = max(colors, key=lambda c: float(c[0]))
-        L = max(float(bg[0]), 0.93)
+        L = min(max(float(bg[0]), 0.93), 0.97)
     else:
+        # Cap at 0.15 (force bg dark even if wallpaper isn't); floor at 0.06
+        # so bg isn't near-pitch-black, which makes everything else strain
+        # for contrast and produces dim color8.
         bg = min(colors, key=lambda c: float(c[0]))
-        L = min(float(bg[0]), 0.15)
+        L = max(min(float(bg[0]), 0.15), 0.06)
 
     C = max(
         oklab_chroma(bg) * 0.7, 0.015
