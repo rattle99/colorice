@@ -54,7 +54,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--min-contrast",
         type=float,
         default=7.0,
-        help="Minimum fg/bg contrast ratio (default: 7.0)",
+        help="Foreground/background contrast ratio target (default: 7.0, "
+        "WCAG AAA). Applied at full value to the foreground (color7/15). "
+        "Colored slots (color1-6, brights) use min(this, 4.5) — values "
+        "above 4.5 don't push colored slots higher because that washes out "
+        "chroma; values below 4.5 are honoured.",
     )
     parser.add_argument(
         "--semantic",

@@ -180,9 +180,13 @@ def _build_palette(
     light: bool,
 ) -> list[str]:
     """Build the 16-color palette from bg, fg, and 6 ANSI colors."""
-    contrast_min = min(min_contrast, 4.5)
+    # Colored slots (color1-6, brights) target WCAG AA (4.5:1) as a HARD
+    # CEILING — pushing higher forces L toward bg's complement and washes
+    # out chroma. If the user dials --min-contrast below 4.5, we honour
+    # that lower target. min_contrast is applied at full value to fg only.
+    colored_contrast = min(min_contrast, 4.5)
     for i in range(len(ansi_colors_lab)):
-        ansi_colors_lab[i] = enforce_contrast(ansi_colors_lab[i], bg, contrast_min)
+        ansi_colors_lab[i] = enforce_contrast(ansi_colors_lab[i], bg, colored_contrast)
 
     ansi_colors_lab = ensure_distinguishable(ansi_colors_lab, min_delta=0.05)
 
@@ -213,7 +217,7 @@ def _build_palette(
         h = oklab_hue(bc)
         bc = oklab_from_lch(float(bc[0]), C * 1.1, h)
         bc = gamut_clamp(bc)
-        bright_colors.append(enforce_contrast(bc, bg, contrast_min))
+        bright_colors.append(enforce_contrast(bc, bg, colored_contrast))
 
     bright_fg = fg.copy()
     if light:
@@ -221,7 +225,7 @@ def _build_palette(
     else:
         bright_fg[0] = min(bright_L_max, bright_fg[0] + 0.08)
     # color15 should always be readable against bg
-    bright_fg = enforce_contrast(bright_fg, bg, contrast_min)
+    bright_fg = enforce_contrast(bright_fg, bg, colored_contrast)
 
     palette = [
         bg,  # 0
