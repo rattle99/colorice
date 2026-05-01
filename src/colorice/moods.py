@@ -88,51 +88,42 @@ def _shortest_hue_shift(h: float, target: float) -> float:
     return diff
 
 
+class _HueShiftMood(BaseMood):
+    """Pull hues toward a center, boost chroma for matching tones."""
+
+    target_hue: float
+    pull_strength: float = 0.4
+    chroma_boost: float = 1.4
+    chroma_dampen: float = 0.7
+    chroma_cap: float = 0.35
+
+    def transform(self, colors: list[np.ndarray]) -> list[np.ndarray]:
+        result = []
+        for c in colors:
+            L = float(c[0])
+            C = oklab_chroma(c)
+            h = oklab_hue(c)
+            shift = _shortest_hue_shift(h, self.target_hue)
+            h = (h + shift * self.pull_strength) % 360
+            if abs(shift) < 90:
+                C = C * self.chroma_boost  # already on the target side
+            else:
+                C = C * self.chroma_dampen  # opposite side, mute it
+            result.append(gamut_clamp(oklab_from_lch(L, min(C, self.chroma_cap), h)))
+        return result
+
+
 @MoodRegistry.register
-class WarmMood(BaseMood):
+class WarmMood(_HueShiftMood):
     """Shift hues toward warm tones (red/orange/yellow center ~30)."""
 
     name = "warm"
-    _warm_center = 30.0  # red-orange
-
-    def transform(self, colors: list[np.ndarray]) -> list[np.ndarray]:
-        result = []
-        for c in colors:
-            L = float(c[0])
-            C = oklab_chroma(c)
-            h = oklab_hue(c)
-            shift = _shortest_hue_shift(h, self._warm_center)
-            # Pull 40% of the way toward warm center
-            h = (h + shift * 0.4) % 360
-            # Boost chroma for already-warm, reduce for cool
-            if abs(shift) < 90:
-                C = C * 1.4
-            else:
-                C = C * 0.7
-            result.append(gamut_clamp(oklab_from_lch(L, min(C, 0.35), h)))
-        return result
+    target_hue = 30.0  # red-orange
 
 
 @MoodRegistry.register
-class CoolMood(BaseMood):
+class CoolMood(_HueShiftMood):
     """Shift hues toward cool tones (blue/cyan center ~220)."""
 
     name = "cool"
-    _cool_center = 220.0  # blue-cyan
-
-    def transform(self, colors: list[np.ndarray]) -> list[np.ndarray]:
-        result = []
-        for c in colors:
-            L = float(c[0])
-            C = oklab_chroma(c)
-            h = oklab_hue(c)
-            shift = _shortest_hue_shift(h, self._cool_center)
-            # Pull 40% of the way toward cool center
-            h = (h + shift * 0.4) % 360
-            # Boost chroma for already-cool, reduce for warm
-            if abs(shift) < 90:
-                C = C * 1.4
-            else:
-                C = C * 0.7
-            result.append(gamut_clamp(oklab_from_lch(L, min(C, 0.35), h)))
-        return result
+    target_hue = 220.0  # blue-cyan
