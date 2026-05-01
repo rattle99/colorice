@@ -95,18 +95,29 @@ def enforce_contrast(
 def ensure_distinguishable(
     colors: list[np.ndarray],
     min_delta: float = 0.05,
+    max_iterations: int = 8,
 ) -> list[np.ndarray]:
-    """Nudge colors apart if their Oklab Euclidean distance < min_delta."""
+    """Nudge colors apart if their Oklab Euclidean distance < min_delta.
+
+    A single pair-by-pair pass isn't sufficient when 3+ colors are clustered,
+    since nudging (i,j) can leave (j,k) inside the threshold. Iterate until
+    no pair is below min_delta or max_iterations is reached.
+    """
     result = [c.copy() for c in colors]
 
-    for i in range(len(result)):
-        for j in range(i + 1, len(result)):
-            dist = float(np.linalg.norm(result[i] - result[j]))
-            if dist < min_delta and dist > 0:
-                # Push apart along the vector between them
-                direction = (result[j] - result[i]) / dist
-                nudge = (min_delta - dist) / 2
-                result[i] = result[i] - direction * nudge
-                result[j] = result[j] + direction * nudge
+    for _ in range(max_iterations):
+        changed = False
+        for i in range(len(result)):
+            for j in range(i + 1, len(result)):
+                dist = float(np.linalg.norm(result[i] - result[j]))
+                if dist < min_delta and dist > 0:
+                    # Push apart along the vector between them
+                    direction = (result[j] - result[i]) / dist
+                    nudge = (min_delta - dist) / 2
+                    result[i] = result[i] - direction * nudge
+                    result[j] = result[j] + direction * nudge
+                    changed = True
+        if not changed:
+            break
 
     return result
