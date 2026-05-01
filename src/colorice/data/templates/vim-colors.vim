@@ -83,7 +83,7 @@ execute "highlight SpecialComment guifg=" . s:blue   . " gui=italic cterm=italic
 execute "highlight Tag           guifg=" . s:cyan
 
 execute "highlight Underlined    guifg=" . s:blue    . " gui=underline cterm=underline"
-execute "highlight Error         guifg=" . s:green   . " gui=undercurl cterm=undercurl"
+execute "highlight Error         guifg=" . s:red     . " gui=undercurl cterm=undercurl"
 execute "highlight Todo          guifg=" . s:bg      . " guibg=" . s:yellow . " gui=bold cterm=bold"
 
 execute "highlight Title         guifg=" . s:cyan    . " gui=bold cterm=bold"
@@ -161,13 +161,13 @@ execute "highlight DiffText      guifg=" . s:fg       . " guibg=" . s:sel      .
 
 " ── Diagnostics / Spell ───────────────────────────────────────────────────────
 
-execute "highlight SpellBad      guisp=" . s:green    . " gui=undercurl cterm=undercurl"
+execute "highlight SpellBad      guisp=" . s:red      . " gui=undercurl cterm=undercurl"
 execute "highlight SpellCap      guisp=" . s:yellow   . " gui=undercurl cterm=undercurl"
 execute "highlight SpellRare     guisp=" . s:magenta  . " gui=undercurl cterm=undercurl"
 execute "highlight SpellLocal    guisp=" . s:br_mag2  . " gui=undercurl cterm=undercurl"
 
 execute "highlight WarningMsg    guifg=" . s:magenta
-execute "highlight ErrorMsg      guifg=" . s:green    . " gui=bold cterm=bold"
+execute "highlight ErrorMsg      guifg=" . s:red      . " gui=bold cterm=bold"
 execute "highlight MoreMsg       guifg=" . s:blue
 execute "highlight Question      guifg=" . s:blue
 execute "highlight Directory     guifg=" . s:yellow
