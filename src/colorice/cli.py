@@ -1,23 +1,26 @@
-"""CLI interface for colorice."""
+"""CLI interface for colorice.
+
+Heavy modules (numpy, PIL, scikit-image, scikit-learn via extraction/palette/
+moods/scheme/display/cache) are imported lazily inside the functions that
+need them. Cheap top-level imports keep `--version`, `--list-moods`, and
+`--init` near-instant. This is a recognised CLI pattern (pip, click, jupyter
+all do the same) and Python's sys.modules cache means the per-call cost is
+negligible after the first import.
+"""
+
+from __future__ import annotations
 
 import argparse
 import json
 import os
 import sys
+from typing import TYPE_CHECKING
 
 from colorice import __version__
-from colorice.cache import get_cache_key, load_cached, save_cache
-from colorice.display import interactive_select
 from colorice.paths import default_config_path, default_output_path
-from colorice.extraction import (
-    extract_dominant_colors,
-    extract_dominant_colors_segmented,
-    fill_color_gaps,
-    load_and_resize,
-)
-from colorice.moods import MoodRegistry
-from colorice.palette import assign_ansi_roles, validate_palette
-from colorice.scheme import ColorScheme
+
+if TYPE_CHECKING:
+    from colorice.scheme import ColorScheme
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -133,6 +136,8 @@ def build_parser() -> argparse.ArgumentParser:
 
 def _load_scheme_from_file(path: str) -> ColorScheme:
     """Load a ColorScheme from an existing JSON file."""
+    from colorice.scheme import ColorScheme
+
     with open(path) as f:
         try:
             data = json.load(f)
@@ -190,6 +195,8 @@ def main() -> None:
 
     # List moods and exit
     if args.list_moods:
+        from colorice.moods import MoodRegistry
+
         for name in MoodRegistry.list_names():
             print(name)
         return
@@ -244,6 +251,18 @@ def main() -> None:
     if not os.path.isfile(args.image):
         print(f"Error: Image not found: {args.image}", file=sys.stderr)
         sys.exit(1)
+
+    # Heavy work begins here — bring in the modules that pull numpy/PIL/sklearn.
+    from colorice.cache import get_cache_key, load_cached, save_cache
+    from colorice.extraction import (
+        extract_dominant_colors,
+        extract_dominant_colors_segmented,
+        fill_color_gaps,
+        load_and_resize,
+    )
+    from colorice.moods import MoodRegistry
+    from colorice.palette import assign_ansi_roles
+    from colorice.scheme import ColorScheme
 
     # Parse moods
     mood_names = [m.strip() for m in args.moods.split(",")]
@@ -303,10 +322,14 @@ def main() -> None:
     if args.no_preview or args.quiet:
         selected = schemes[0]
     else:
+        from colorice.display import interactive_select
+
         selected = interactive_select(schemes)
 
     # Validate palette
     if not args.quiet:
+        from colorice.palette import validate_palette
+
         warnings = validate_palette(selected.colors)
         for w in warnings:
             print(w, file=sys.stderr)
