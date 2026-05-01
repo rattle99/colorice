@@ -1,5 +1,9 @@
 # Colorice
 
+[![PyPI](https://img.shields.io/pypi/v/colorice?style=for-the-badge&logo=pypi&logoColor=white&color=bd93f9)](https://pypi.org/project/colorice/)
+[![Python](https://img.shields.io/pypi/pyversions/colorice?style=for-the-badge&logo=python&logoColor=white&color=bd93f9)](https://pypi.org/project/colorice/)
+[![License](https://img.shields.io/badge/license-GPL--3.0-bd93f9?style=for-the-badge)](LICENSE)
+
 Colorice is a modern alternative to pywal that uses Oklab color space for perceptually accurate color extraction, generates multiple mood variants (vibrant, muted, warm, cool) to preview and select from, enforces WCAG contrast ratios, and applies schemes across your full desktop rice via a pywal-compatible template engine(yes existing pywal templates work) with color manipulation filters.
 
 ## Install
