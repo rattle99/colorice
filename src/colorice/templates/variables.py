@@ -33,7 +33,6 @@ _MANIPULATION_RE = re.compile(
     r")\}"
 )
 
-_FORMAT_MODIFIERS = {"strip", "rgb", "rgba", "red", "green", "blue"}
 _MANIPULATIONS = {"lighten", "darken", "saturate", "desaturate"}
 
 
