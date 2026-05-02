@@ -6,6 +6,46 @@
 
 Colorice is a modern alternative to pywal that uses Oklab color space for perceptually accurate color extraction, generates multiple mood variants (vibrant, muted, warm, cool) to preview and select from, enforces WCAG contrast ratios, and applies schemes across your full desktop rice via a pywal-compatible template engine(yes existing pywal templates work) with color manipulation filters.
 
+### 📸 In Action
+<p align="center">
+  <img width="99%" alt="Hero" src="https://github.com/user-attachments/assets/39fe3af7-aea9-4107-b697-b3ec0b3cb5e2" />
+</p>
+<br><br>
+
+<details>
+  <summary>More Examples! ✨ </summary>
+  
+  <p align="center">
+    <img width="49%" alt="image3" src="https://github.com/user-attachments/assets/d1a260b9-b547-4fe6-97c7-5c6243deb82b" />
+    <img width="49%" alt="image1" src="https://github.com/user-attachments/assets/cc4babb2-9e72-4a1a-a45c-c539d9617de9" />
+  </p>
+  
+  <p align="center">
+    <img width="49%" alt="image4" src="https://github.com/user-attachments/assets/fdabeb25-ac64-483e-9bdd-8eebec100fb4" />
+    <img width="49%" alt="image2" src="https://github.com/user-attachments/assets/9f8480f9-303e-422f-b470-34b2f4d26154" />
+  </p>
+  <p align="center"><em>From image → a complete desktop theme</em></p>
+  <p></p>
+  <br><br>
+  
+   
+  <p align="center">
+    <img width="49%" alt="Monochrome_A" src="https://github.com/user-attachments/assets/74c87089-565d-4318-9ae6-7eae472851b5" />
+    <img width="49%" alt="Monochrome_B" src="https://github.com/user-attachments/assets/a1483904-12a7-4f7c-b3ae-ca6aae8dce0f" />
+  </p>
+  <p align="center"><em>Respects contrast ratios even for palettes sourced from mostly monochrome or flat images.</em></p>
+  <p></p>
+  <br><br>
+  
+  <p align="center">
+    <img width="49%" alt="2026-05-02_05-50" src="https://github.com/user-attachments/assets/15af6d3e-0110-4ee5-ae5c-c51b739596e6" />
+    <img width="49%" alt="2026-05-02_05-50_1" src="https://github.com/user-attachments/assets/d01bc890-d2d2-4f92-91b4-9dfc4e3e5733" />
+  </p>
+  <p align="center"><em>Picks a rich variety of colours for your palette given a rich and vibrant image.</em></p>
+  <p></p>
+  <br><br>
+</details>
+
 ## Install
 
 Requires Python 3.11+.
